@@ -1,3 +1,4 @@
+import './spectrum.css';
 import tinycolor from 'tinycolor2';
 import { ColorInput, Instance } from 'tinycolor2';
 import { insertAfter, outerWidthWithMargin, wrap } from './dom';

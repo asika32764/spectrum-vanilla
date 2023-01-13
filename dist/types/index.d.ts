@@ -1,3 +1,4 @@
+import './spectrum.css';
 import { ColorInput } from 'tinycolor2';
 import { Options } from './types';
 import { OffsetCSSOptions } from './utils';
