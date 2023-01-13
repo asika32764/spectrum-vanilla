@@ -1,3 +1,5 @@
+import { OffsetCSSOptions } from './utils';
+
 /**
  * Part of spectrum-vanilla project.
  *
@@ -13,6 +15,12 @@ export interface Options {
     show: Function;
     hide: Function;
   }
+
+  beforeShow?: Function,
+  move?: Function,
+  change?: Function,
+  show?: Function,
+  hide?: Function,
 
   // Options
   color: string;
@@ -37,7 +45,7 @@ export interface Options {
   togglePaletteLessText:string;
   clearText: string;
   noColorSelectedText: string;
-  preferredFormat: "rgb" | "prgb" | "hex" | "hex6" | "hex3" | "hex4" | "hex8" | "name" | "hsl" | "hsv";
+  preferredFormat: ColorFormat;
   containerClassName: string;
   replacerClassName: string;
   showAlpha: boolean;
@@ -45,5 +53,7 @@ export interface Options {
   palette: string[][];
   selectionPalette: string[];
   disabled: boolean;
-  offset: number|null;
+  offset: OffsetCSSOptions|null;
 }
+
+export type ColorFormat = "rgb" | "prgb" | "hex" | "hex6" | "hex3" | "hex4" | "hex8" | "name" | "hsl" | "hsv";

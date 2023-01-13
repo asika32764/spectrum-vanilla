@@ -4,6 +4,7 @@
     "version": "2.0.9",
     "main": "dist/spectrum.js",
     "license": "MIT",
+    "sideEffects": false,
     "keywords": [
         "color",
         "colorpicker",
@@ -31,9 +32,8 @@
         "@babel/preset-env": "^7.14.5",
         "@types/tinycolor2": "^1.4.3",
         "tinycolor2": "^1.5.2",
-        "webpack-cli": "^5.0.1"
-    },
-    "dependencies": {
+        "webpack-cli": "^5.0.1",
+        "@babel/preset-typescript": "^7.18.6",
         "babel-loader": "^9.1.2",
         "css-loader": "^6.7.3",
         "sass-loader": "^13.2.0",

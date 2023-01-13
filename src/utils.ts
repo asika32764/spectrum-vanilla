@@ -12,12 +12,12 @@ export function html(html: string) {
 }
 
 export function camelize(str: string): string {
-  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
     return index === 0 ? word.toLowerCase() : word.toUpperCase();
   }).replace(/\s+/g, '');
 }
 
-export function throttle(func: Function, wait: number, debounce: Function|undefined = undefined) {
+export function throttle(func: Function, wait: number, debounce: Function | undefined = undefined) {
   let timeout: any;
   return function () {
     // @ts-ignore
@@ -34,18 +34,25 @@ export function throttle(func: Function, wait: number, debounce: Function|undefi
 }
 
 export function addClass(ele: HTMLElement, className: string) {
-  const classes = className.split(' ');
-  ele.classList.add(...classes);
+  const classes = className.split(' ').filter((c) => c !== '');
+
+  if (className !== '' && classes.length) {
+    ele.classList.add(...classes);
+  }
   return ele;
 }
 
 export function removeClass(ele: HTMLElement, className: string) {
-  const classes = className.split(' ');
-  ele.classList.remove(...classes);
+  const classes = className.split(' ').filter((c) => c !== '');
+  if (className !== '' && classes.length) {
+    ele.classList.remove(...classes);
+  }
   return ele;
 }
 
-export function toggleClass(ele: HTMLElement, className: string, state: boolean|undefined = undefined) {
+export function toggleClass(ele: HTMLElement,
+                            className: string,
+                            state: boolean | undefined = undefined) {
   if (state != undefined) {
     ele.classList.toggle(className);
   } else if (state === true) {
@@ -60,8 +67,8 @@ export function emit(ele: EventTarget, eventName: string, detail: any = {}) {
   const event = new CustomEvent(
     eventName,
     {
-      detail
-    }
+      detail,
+    },
   );
 
   ele.dispatchEvent(event);
@@ -84,4 +91,79 @@ export function eventDelegate(
       listener(e);
     }
   }, payload);
+}
+
+export type OffsetCSSOptions = { top?: number, bottom?: number, left?: number, right?: number, using?: Function };
+
+export function setElementOffset(
+  elem: HTMLElement,
+  options: OffsetCSSOptions
+) {
+  let curPosition;
+  let curTop;
+  let curLeft;
+  let calculatePosition;
+  let position = elem.style.position
+  let curElem = elem;
+  let props: OffsetCSSOptions = {};
+
+  // Set position first, in-case top/left are set even on static elem
+  if (position === "static") {
+    elem.style.position = "relative";
+  }
+
+  let curOffset = getElementOffset(curElem);
+  let curCSSTop = elem.style.top
+  let curCSSLeft = elem.style.left;
+  calculatePosition = (position === "absolute" || position === "fixed") &&
+    (curCSSTop + curCSSLeft).indexOf("auto") > -1;
+
+  // Need to be able to calculate position if either
+  // top or left is auto and position is either absolute or fixed
+  if (calculatePosition) {
+    curPosition = getElementPosition(curElem);
+    curTop = curPosition.top;
+    curLeft = curPosition.left;
+
+  } else {
+    curTop = parseFloat(curCSSTop) || 0;
+    curLeft = parseFloat(curCSSLeft) || 0;
+  }
+
+  // if (typeof options === 'function') {
+  //   options = options.call(elem, Object.assign({}, curOffset)) as OffsetCSSOptions;
+  // }
+
+  if (options.top != null) {
+    props.top = (options.top - curOffset.top) + curTop;
+  }
+  if (options.left != null) {
+    props.left = (options.left - curOffset.left) + curLeft;
+  }
+
+  if ("using" in options) {
+    options.using.call(elem, props);
+  } else {
+    for (const k in props) {
+      curElem.style[k] = props[k];
+    }
+  }
+}
+
+export function getElementOffset(el: HTMLElement) {
+  const box = el.getBoundingClientRect();
+  const docElem = document.documentElement;
+  return {
+    top: box.top + window.pageYOffset - docElem.clientTop,
+    left: box.left + window.pageXOffset - docElem.clientLeft
+  };
+}
+
+export function getElementPosition(el: HTMLElement) {
+  const {top, left} = el.getBoundingClientRect();
+  const {marginTop, marginLeft} = getComputedStyle(el);
+  return {
+    top: top - parseInt(marginTop, 10),
+    left: left - parseInt(marginLeft, 10)
+  };
 }

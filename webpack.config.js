@@ -24,12 +24,21 @@ const config = {
   output: {
     path: path.resolve('./dist'),
     filename: output,
-    libraryTarget,
-    library: ['Spectrum'],
-    sourceMapFilename: "spectrum.js.map"
+    library: {
+      name: 'Spectrum',
+      type: libraryTarget,
+      export: "default",
+    },
+    globalObject: 'this',
+    sourceMapFilename: "spectrum.js.map",
+    clean: true
+  },
+  resolve: {
+    extensions: ['.ts', '.js', '.json']
   },
   optimization: {
-    concatenateModules: true,
+    usedExports: true,
+    // concatenateModules: true,
     // minimize: true,
   },
   devtool: 'source-map',
@@ -57,6 +66,9 @@ const config = {
             loader: 'babel-loader',
             options: {
               presets: [
+                // [
+                //   '@babel/preset-typescript'
+                // ],
                 [
                   '@babel/preset-env',
                   {
@@ -71,41 +83,19 @@ const config = {
               ]
             }
           },
-          "ts-loader"
+          'ts-loader'
         ],
         // exclude: /(node_modules|bower_components)/,
         // options:{}
-      },
-      {
-        test: /\.m?js$/,
-        // exclude: /(node_modules|bower_components)/,
-        use: [{
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              [
-                '@babel/preset-env',
-                {
-                  targets: 'last 3 version, safari 10, ie 11, not dead',
-                  modules: false
-                }
-              ],
-            ],
-            plugins: [
-              '@babel/plugin-proposal-class-properties',
-              '@babel/plugin-proposal-optional-chaining',
-            ]
-          }
-        }]
       }
     ]
   },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env': {
-        'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-      }
-    })
+    // new webpack.DefinePlugin({
+    //   'process.env': {
+    //     'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+    //   }
+    // })
   ]
 };
 

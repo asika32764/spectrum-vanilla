@@ -1,11 +1,23 @@
-import { insertAfter, insertBefore, outerWidthWithMargin, wrap } from './dom';
-import { Options } from './types';
-import { addClass, emit, eventDelegate, html, removeClass, throttle, toggleClass } from './utils';
-import tinycolor, { ColorInput, Instance } from 'tinycolor2';
+import tinycolor from 'tinycolor2';
+import { ColorInput, Instance } from 'tinycolor2';
+import { insertAfter, outerWidthWithMargin, wrap } from './dom';
+import { ColorFormat, Options } from './types';
+import {
+  addClass,
+  emit,
+  eventDelegate,
+  getElementOffset,
+  html,
+  OffsetCSSOptions,
+  removeClass,
+  setElementOffset,
+  throttle,
+  toggleClass,
+} from './utils';
 
 const localization: any = {};
 
-const defaultOpts = {
+const defaultOpts: Partial<Options> = {
 
     // Callbacks
     beforeShow: noop,
@@ -16,7 +28,7 @@ const defaultOpts = {
 
     // Options
     color: '',
-    type: '', // text, color, component or flat
+    type: 'color', // text, color, component or flat
     showInput: false,
     allowEmpty: true,
     showButtons: true,
@@ -52,11 +64,11 @@ const defaultOpts = {
       [ '#990000', '#b45f06', '#bf9000', '#38761d', '#134f5c', '#0b5394', '#351c75', '#741b47' ],
       [ '#660000', '#783f04', '#7f6000', '#274e13', '#0c343d', '#073763', '#20124d', '#4c1130' ]
     ],
-    selectionPalette: [],
+    selectionPalette: [] as string[],
     disabled: false,
-    offset: null
+    offset: {}
   },
-  spectrums: HTMLElement[] = [],
+  spectrums: any[] = [],
   IE = !!/msie/i.exec(window.navigator.userAgent),
   rgbaSupport = (() => {
     function contains(str: string, substr: string) {
@@ -75,7 +87,7 @@ const defaultOpts = {
       '<div class=\'sp-dd\'>&#9660;</div>',
       '</div>'
     ].join('')
-  ),
+  ) as HTMLElement,
   markup = (function () {
 
     // IE does not support gradients with multiple stops, so we need to simulate
@@ -154,13 +166,13 @@ function hideAll() {
   }
 }
 
-function instanceOptions(options: Options, callbackContext: object): Options {
+function instanceOptions(options: Partial<Options>, callbackContext: object): Options {
   options.locale = options.locale || window.navigator.language;
   if (options.locale) options.locale = options.locale.split('-')[0].toLowerCase(); // handle locale like "fr-FR"
   if (options.locale !== 'en' && localization[options.locale]) {
     options = Object.assign({}, localization[options.locale], options);
   }
-  const opts = Object.assign({}, defaultOpts, options);
+  const opts = Object.assign({}, defaultOpts, options) as Options;
 
   opts.callbacks = {
     'move': bind(opts.move as Function, callbackContext),
@@ -173,7 +185,7 @@ function instanceOptions(options: Options, callbackContext: object): Options {
   return opts;
 }
 
-function spectrum(element: HTMLInputElement, options: any) {
+function spectrum(element: HTMLInputElement, options: Partial<Options>) {
 
   let opts = instanceOptions(options, element),
     type = opts.type,
@@ -229,11 +241,12 @@ function spectrum(element: HTMLInputElement, options: any) {
     chooseButton = container.querySelector('.sp-choose') as HTMLElement,
     toggleButton = container.querySelector('.sp-palette-toggle') as HTMLElement,
     isInput = boundElement.nodeName === 'INPUT',
-    isInputTypeColor = isInput && boundElement.getAttribute('type') === 'color' && inputTypeColorSupport(),
+    isInputTypeColor = isInput && boundElement.getAttribute('type') === 'color',
     shouldReplace = isInput && type === 'color',
     replacer = (shouldReplace)
       ? (() => {
-          replaceInput.classList.add(theme, opts.replacerClassName);
+          addClass(replaceInput, theme);
+          addClass(replaceInput, opts.replacerClassName);
           return replaceInput;
         })()
       : null,
@@ -248,7 +261,7 @@ function spectrum(element: HTMLInputElement, options: any) {
 
   // Element to be updated with the input color. Populated in initialize method
   let originalInputContainer: HTMLSpanElement;
-  let colorizeElement: HTMLElement;
+  let colorizeElement: HTMLElement|null;
   let colorizeElementInitialColor: string;
   let colorizeElementInitialBackground: string;
 
@@ -309,6 +322,19 @@ function spectrum(element: HTMLInputElement, options: any) {
     reflow();
   }
 
+  function offsetElementStart(e: Event) {
+    if (!disabled) {
+      show();
+    }
+
+    e.stopPropagation();
+    const target = e.target as HTMLElement;
+
+    if (!target.matches('input')) {
+      e.preventDefault();
+    }
+  }
+
   function initialize() {
 
     if (IE) {
@@ -348,9 +374,9 @@ function spectrum(element: HTMLInputElement, options: any) {
       boundElement.before(addOn);
     }
 
-    colorizeElement = boundElement.parentNode?.querySelector('.sp-colorize') as HTMLElement;
-    colorizeElementInitialColor = colorizeElement.style.color;
-    colorizeElementInitialBackground = colorizeElement.style.backgroundColor;
+    colorizeElement = boundElement.parentNode?.querySelector('.sp-colorize');
+    colorizeElementInitialColor = colorizeElement?.style.color || '';
+    colorizeElementInitialBackground = colorizeElement?.style.backgroundColor || '';
 
     if (!allowEmpty) {
       clearButton.style.display = 'none';
@@ -373,28 +399,15 @@ function spectrum(element: HTMLInputElement, options: any) {
 
     updateSelectionPaletteFromStorage();
 
-    function start(e: Event) {
-      if (!disabled) {
-        show();
-      }
-
-      e.stopPropagation();
-      const target = e.target as HTMLElement;
-
-      if (!target.matches('input')) {
-        e.preventDefault();
-      }
-    }
-
-    offsetElement?.addEventListener('click.spectrum', start);
-    offsetElement?.addEventListener('touchstart.spectrum', start);
+    offsetElement?.addEventListener('click', offsetElementStart);
+    offsetElement?.addEventListener('touchstart', offsetElementStart);
 
     if (boundElement.matches(':disabled') || opts.disabled) {
       disable();
     }
 
     // Prevent clicks from bubbling up to document.  This would cause it to be hidden.
-    container.addEventListener('click', stopPropagation);
+    container.addEventListener('click', (e) => e.stopPropagation());
 
     // Handle user typed input
     [ textInput, boundElement ].forEach(function (input) {
@@ -805,7 +818,7 @@ function spectrum(element: HTMLInputElement, options: any) {
     updateUI();
 
     if (newColor && newColor.isValid() && !ignoreFormatChange) {
-      currentPreferredFormat = opts.preferredFormat || newColor.getFormat();
+      currentPreferredFormat = opts.preferredFormat || newColor.getFormat() as ColorFormat;
     }
   }
 
@@ -881,7 +894,7 @@ function spectrum(element: HTMLInputElement, options: any) {
         const gradient = 'linear-gradient(left, ' + realAlpha + ', ' + realHex + ')';
 
         if (IE) {
-          alphaSliderInner.style.filter = tinycolor(realAlpha).toFilter({ gradientType: 1 }, realHex);
+          alphaSliderInner.style.filter = tinycolor(realAlpha).toFilter(/* { gradientType: 1 }, realHex */);
         } else {
           // alphaSliderInner.css('background', '-webkit-' + gradient);
           // alphaSliderInner.css('background', '-moz-' + gradient);
@@ -919,9 +932,6 @@ function spectrum(element: HTMLInputElement, options: any) {
   }
 
   function updateHelperLocations() {
-    const s = currentSaturation;
-    const v = currentValue;
-
     if (allowEmpty && isEmpty) {
       //if selected color is empty, hide the helpers
       alphaSlideHelper.style.display = 'none';
@@ -934,8 +944,8 @@ function spectrum(element: HTMLInputElement, options: any) {
       dragHelper.style.display = 'block';
 
       // Where to show the little circle in that displays your current selected color
-      let dragX = s * dragWidth;
-      let dragY = dragHeight - (v * dragHeight);
+      let dragX = currentSaturation * dragWidth;
+      let dragY = dragHeight - (currentValue * dragHeight);
       dragX = Math.max(
         -dragHelperHeight,
         Math.min(dragWidth - dragHelperHeight, dragX - dragHelperHeight)
@@ -957,7 +967,7 @@ function spectrum(element: HTMLInputElement, options: any) {
   }
 
   function updateOriginalInput(fireCallback = false) {
-    var color = get(),
+    let color = get(),
       displayColor = '',
       hasChanged = !tinycolor.equals(color, colorOnShow);
 
@@ -972,7 +982,7 @@ function spectrum(element: HTMLInputElement, options: any) {
       // we trigger the change event or input, but the input change event is also binded
       // to some spectrum processing, that we do no need
       abortNextInputChange = true;
-      boundElement.trigger('change', [ color ]);
+      emit(boundElement, 'change', [ color ]);
     }
   }
 
@@ -980,21 +990,23 @@ function spectrum(element: HTMLInputElement, options: any) {
     if (!visible) {
       return; // Calculations would be useless and wouldn't be reliable anyways
     }
-    dragWidth = dragger.width();
-    dragHeight = dragger.height();
-    dragHelperHeight = dragHelper.height();
-    slideWidth = slider.width();
-    slideHeight = slider.height();
-    slideHelperHeight = slideHelper.height();
-    alphaWidth = alphaSlider.width();
-    alphaSlideHelperWidth = alphaSlideHelper.width();
+
+    dragWidth = dragger.getBoundingClientRect().width;
+    dragHeight = dragger.getBoundingClientRect().height;
+
+    dragHelperHeight = dragHelper.getBoundingClientRect().height;
+    slideWidth = slider.getBoundingClientRect().width;
+    slideHeight = slider.getBoundingClientRect().height;
+    slideHelperHeight = slideHelper.getBoundingClientRect().height;
+    alphaWidth = alphaSlider.getBoundingClientRect().width;
+    alphaSlideHelperWidth = alphaSlideHelper.getBoundingClientRect().width;
 
     if (!flat) {
-      container.css('position', 'absolute');
+      container.style.position = 'absolute';
       if (opts.offset) {
-        container.offset(opts.offset);
+        setElementOffset(container, opts.offset);
       } else {
-        container.offset(getOffset(container, offsetElement));
+        setElementOffset(container, getOffset(container, offsetElement as HTMLElement));
       }
     }
 
@@ -1004,28 +1016,31 @@ function spectrum(element: HTMLInputElement, options: any) {
       drawPalette();
     }
 
-    boundElement.trigger('reflow.spectrum');
+    emit(boundElement, 'reflow.spectrum');
   }
 
   function destroy() {
-    boundElement.show().removeClass('spectrum with-add-on sp-colorize');
-    offsetElement.off('click.spectrum touchstart.spectrum');
+    boundElement.style.display = 'block';
+    boundElement.classList.remove('spectrum', 'with-add-on', 'sp-colorize');
+    offsetElement.removeEventListener('click', offsetElementStart);
+    offsetElement.removeEventListener('touchstart', offsetElementStart);
     container.remove();
     replacer.remove();
     if (colorizeElement) {
-      colorizeElement.css('background-color', colorizeElementInitialBackground)
-        .css('color', colorizeElementInitialColor);
+      colorizeElement.style.backgroundColor = colorizeElementInitialBackground;
+      colorizeElement.style.color = colorizeElementInitialColor;
     }
     const originalInputContainer = boundElement.closest('.sp-original-input-container');
-    if (originalInputContainer.length > 0) {
-      originalInputContainer.after(boundElement).remove();
+    if (originalInputContainer) {
+      originalInputContainer.after(boundElement);
+      originalInputContainer.remove();
     }
     spectrums[spect.id] = null;
   }
 
-  function option(optionName, optionValue) {
+  function option(optionName: string|undefined = undefined, optionValue: any = undefined) {
     if (optionName === undefined) {
-      return $.extend({}, opts);
+      return Object.assign({}, opts);
     }
     if (optionValue === undefined) {
       return opts[optionName];
@@ -1041,25 +1056,26 @@ function spectrum(element: HTMLInputElement, options: any) {
 
   function enable() {
     disabled = false;
-    boundElement.attr('disabled', false);
-    offsetElement.removeClass('sp-disabled');
+    boundElement.disabled = false;
+    offsetElement.classList.remove('sp-disabled');
   }
 
   function disable() {
     hide();
     disabled = true;
-    boundElement.attr('disabled', true);
-    offsetElement.addClass('sp-disabled');
+    boundElement.disabled = true;
+    offsetElement.classList.add('sp-disabled');
   }
 
-  function setOffset(coord) {
+  function setOffset(coord: OffsetCSSOptions) {
     opts.offset = coord;
     reflow();
   }
 
   initialize();
 
-  var spect = {
+  let spect = {
+    id: 0,
     show: show,
     hide: hide,
     toggle: toggle,
@@ -1068,7 +1084,7 @@ function spectrum(element: HTMLInputElement, options: any) {
     enable: enable,
     disable: disable,
     offset: setOffset,
-    set: function (c) {
+    set: function (c: ColorInput) {
       set(c);
       updateOriginalInput();
     },
@@ -1086,18 +1102,18 @@ function spectrum(element: HTMLInputElement, options: any) {
  * checkOffset - get the offset below/above and left/right element depending on screen position
  * Thanks https://github.com/jquery/jquery-ui/blob/master/ui/jquery.ui.datepicker.js
  */
-function getOffset(picker, input) {
-  var extraY = 0;
-  var dpWidth = picker.outerWidth();
-  var dpHeight = picker.outerHeight();
-  var inputHeight = input.outerHeight();
-  var doc = picker[0].ownerDocument;
-  var docElem = doc.documentElement;
-  var viewWidth = docElem.clientWidth + $(doc).scrollLeft();
-  var viewHeight = docElem.clientHeight + $(doc).scrollTop();
-  var offset = input.offset();
-  var offsetLeft = offset.left;
-  var offsetTop = offset.top;
+function getOffset(picker: HTMLElement, input: HTMLElement) {
+  const extraY = 0;
+  const dpWidth = picker.offsetWidth;
+  const dpHeight = picker.offsetHeight;
+  const inputHeight = input.offsetHeight;
+  const doc = picker[0].ownerDocument;
+  const docElem = doc.documentElement;
+  const viewWidth = docElem.clientWidth + doc.pageXOffset;
+  const viewHeight = docElem.clientHeight + doc.pageYOffset;
+  const offset = getElementOffset(input);
+  let offsetLeft = offset.left;
+  let offsetTop = offset.top;
 
   offsetTop += inputHeight;
 
@@ -1111,11 +1127,11 @@ function getOffset(picker, input) {
 
   return {
     top: offsetTop,
-    bottom: offset.bottom,
+    // bottom: offset.bottom,
     left: offsetLeft,
-    right: offset.right,
-    width: offset.width,
-    height: offset.height
+    // right: offset.right,
+    // width: offset.width,
+    // height: offset.height
   };
 }
 
@@ -1127,19 +1143,12 @@ function noop() {
 }
 
 /**
- * stopPropagation - makes the code only doing this a little easier to read in line
- */
-function stopPropagation(e) {
-  e.stopPropagation();
-}
-
-/**
  * Create a function bound to a given object
  * Thanks to underscore.js
  */
 function bind(func: Function, obj: object) {
-  var slice = Array.prototype.slice;
-  var args = slice.call(arguments, 2);
+  const slice = Array.prototype.slice;
+  const args = slice.call(arguments, 2);
   return function () {
     return func.apply(obj, args.concat(slice.call(arguments)));
   };
@@ -1155,24 +1164,23 @@ function draggable(
   onstart: (x: number, y: number, e: DragEvent) => void,
   onstop: (x: number, y: number, e: DragEvent) => void,
 ) {
-  onmove = onmove || function () {
-  };
-  onstart = onstart || function () {
-  };
-  onstop = onstop || function () {
-  };
+  onmove = onmove || noop;
+  onstart = onstart || noop;
+  onstop = onstop || noop;
   const doc = document;
   let dragging = false;
-  let offset = {};
+  let offset: OffsetCSSOptions = {};
   let maxHeight = 0;
   let maxWidth = 0;
   const hasTouch = ('ontouchstart' in window);
 
-  const duringDragEvents: any = {};
+  const duringDragEvents: { [P in keyof ElementEventMap]?: Function; } = {};
   duringDragEvents['selectstart'] = prevent;
   duringDragEvents['dragstart'] = prevent;
-  duringDragEvents['touchmove mousemove'] = move;
-  duringDragEvents['touchend mouseup'] = stop;
+  duringDragEvents['touchmove'] = move;
+  duringDragEvents['mousemove'] = move;
+  duringDragEvents['touchend'] = stop;
+  duringDragEvents['mouseup'] = stop;
 
   function prevent(e: Event) {
     if (e.stopPropagation) {
@@ -1184,19 +1192,20 @@ function draggable(
     e.returnValue = false;
   }
 
-  function move(e: DragEvent) {
+  function move(e: TouchEvent|MouseEvent) {
     if (dragging) {
+      // @ts-ignore
       // Mouseup happened outside of window
       if (IE && doc.documentMode < 9 && !e.button) {
         return stop();
       }
 
-      var t0 = e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0];
-      var pageX = t0 && t0.pageX || e.pageX;
-      var pageY = t0 && t0.pageY || e.pageY;
+      const t0 = 'touches' in e && e.touches[0];
+      const pageX = t0 && t0.pageX || (e as MouseEvent).pageX;
+      const pageY = t0 && t0.pageY || (e as MouseEvent).pageY;
 
-      var dragX = Math.max(0, Math.min(pageX - offset.left, maxWidth));
-      var dragY = Math.max(0, Math.min(pageY - offset.top, maxHeight));
+      const dragX = Math.max(0, Math.min(pageX - offset.left, maxWidth));
+      const dragY = Math.max(0, Math.min(pageY - offset.top, maxHeight));
 
       if (hasTouch) {
         // Stop scrolling in iOS
@@ -1207,18 +1216,21 @@ function draggable(
     }
   }
 
-  function start(e) {
-    var rightclick = (e.which) ? (e.which == 3) : (e.button == 2);
+  function start(e: TouchEvent|MouseEvent) {
+    const rightclick = (e.which) ? (e.which == 3) : ((e as MouseEvent).button === 2);
 
     if (!rightclick && !dragging) {
       if (onstart.apply(element, arguments) !== false) {
         dragging = true;
-        maxHeight = $(element).height();
-        maxWidth = $(element).width();
-        offset = $(element).offset();
+        maxHeight = element.getBoundingClientRect().height;
+        maxWidth = element.getBoundingClientRect().width;
+        offset = getElementOffset(element);
 
-        $(doc).on(duringDragEvents);
-        $(doc.body).addClass('sp-dragging');
+        for (const eventName in duringDragEvents) {
+          doc.addEventListener(eventName, duringDragEvents[eventName]);
+        }
+
+        doc.body.classList.add('sp-dragging');
 
         move(e);
 
@@ -1229,8 +1241,10 @@ function draggable(
 
   function stop() {
     if (dragging) {
-      $(doc).off(duringDragEvents);
-      $(doc.body).removeClass('sp-dragging');
+      for (const eventName in duringDragEvents) {
+        doc.removeEventListener(eventName, duringDragEvents[eventName]);
+      }
+      doc.body.classList.remove('sp-dragging');
 
       // Wait a tick before notifying observers to allow the click event
       // to fire in Chrome.
@@ -1241,86 +1255,104 @@ function draggable(
     dragging = false;
   }
 
-  $(element).on('touchstart mousedown', start);
+  element.addEventListener('touchstart', start);
+  element.addEventListener('mousedown', start);
 }
 
-function inputTypeColorSupport() {
-  return $.fn.spectrum.inputTypeColorSupport();
-}
+export default class Spectrum {
+  private spectrum: any;
+  public ele: HTMLInputElement;
+  public options: Partial<Options>;
 
-/**
- * Define a jQuery plugin
- */
-var dataID = 'spectrum.id';
-$.fn.spectrum = function (opts, extra) {
+  static defaultOptions = defaultOpts;
+  static draggable = draggable;
 
-  if (typeof opts == 'string') {
+  static create(selector: string|HTMLInputElement, options: Partial<Options> = {}) {
+    return new this(this.wrap(selector), options);
+  }
 
-    var returnValue = this;
-    var args = Array.prototype.slice.call(arguments, 1);
+  static getInstance(selector: string|HTMLInputElement, options: Partial<Options> = {}) {
+    const ele = this.wrap(selector);
 
-    this.each(function () {
-      var spect = spectrums[$(this).data(dataID)];
-      if (spect) {
-        var method = spect[opts];
-        if (!method) {
-          throw new Error('Spectrum: no such method: \'' + opts + '\'');
-        }
+    // @ts-ignore
+    return ele.__spectrum = ele.__spectrum || this.create(ele, options);
+  }
 
-        if (opts == 'get') {
-          returnValue = spect.get();
-        } else if (opts == 'container') {
-          returnValue = spect.container;
-        } else if (opts == 'option') {
-          returnValue = spect.option.apply(spect, args);
-        } else if (opts == 'destroy') {
-          spect.destroy();
-          $(this).removeData(dataID);
-        } else {
-          method.apply(spect, args);
-        }
-      }
+  static createMultiple(selector: string|NodeListOf<HTMLInputElement>, options: Partial<Options> = {}) {
+    const instances: Spectrum[] = [];
+
+    this.wrapList(selector).forEach((ele) => {
+      instances.push(this.create(ele, options));
     });
 
-    return returnValue;
+    return instances;
   }
 
-  // Initializing a new instance of spectrum
-  return this.spectrum('destroy').each(function () {
-    var options = $.extend({}, $(this).data(), opts);
-    // Infer default type from input params and deprecated options
-    if (!$(this).is('input')) options.type = 'noInput';
-    else if (options.flat || options.type == 'flat') options.type = 'flat';
-    else if ($(this).attr('type') == 'color') options.type = 'color';
-    else options.type = options.type || 'component';
+  static getInstanceMultiple(selector: string|NodeListOf<HTMLInputElement>, options: Partial<Options> = {}) {
+    const instances: Spectrum[] = [];
 
-    var spect = spectrum(this, options);
-    $(this).data(dataID, spect.id);
-  });
-};
+    this.wrapList(selector).forEach((ele) => {
+      instances.push(this.getInstance(ele, options));
+    });
 
-$.fn.spectrum.load = true;
-$.fn.spectrum.loadOpts = {};
-$.fn.spectrum.draggable = draggable;
-$.fn.spectrum.defaults = defaultOpts;
-$.fn.spectrum.inputTypeColorSupport = function inputTypeColorSupport() {
-  if (typeof inputTypeColorSupport._cachedResult === 'undefined') {
-    var colorInput = $('<input type=\'color\'/>')[0]; // if color element is supported, value will default to not null
-    inputTypeColorSupport._cachedResult = colorInput.type === 'color' && colorInput.value !== '';
+    return instances;
   }
-  return inputTypeColorSupport._cachedResult;
-};
 
-// $.spectrum = {};
-// $.spectrum.localization = {};
-// $.spectrum.palettes = {};
+  private static wrap(selector: string|HTMLInputElement) {
+    if (typeof selector === 'string') {
+      return document.querySelector<HTMLInputElement>(selector);
+    } else {
+      return selector;
+    }
+  }
 
-// $.fn.spectrum.processNativeColorInputs = function () {
-//   var colorInputs = $('input[type=color]');
-//   if (colorInputs.length && !inputTypeColorSupport()) {
-//     colorInputs.spectrum({
-//       preferredFormat: 'hex6'
-//     });
-//   }
-// };
+  private static wrapList(selector: string|NodeListOf<HTMLInputElement>) {
+    if (typeof selector === 'string') {
+      return document.querySelectorAll<HTMLInputElement>(selector);
+    } else {
+      return selector;
+    }
+  }
 
+  constructor(ele: HTMLInputElement, options: Partial<Options> = {}) {
+    this.spectrum = spectrum(ele, options);
+    this.ele = ele;
+    this.options = options;
+  }
+
+  get id(): number {
+    return this.spectrum.id;
+  }
+
+  get container(): HTMLElement {
+    return this.spectrum.constructor;
+  }
+
+  show() { this.spectrum.show(); return this; }
+  hide() { this.spectrum.hide(); return this; }
+  toggle() { this.spectrum.toggle(); return this; }
+  reflow() { this.spectrum.reflow(); return this; }
+  option(optionName: string|undefined = undefined, optionValue: any = undefined): any {
+    return this.spectrum.option(optionName, optionValue);
+  }
+  enable() { this.spectrum.enable(); return this; }
+  disable() { this.spectrum.disable(); return this; }
+  offset(coord: OffsetCSSOptions) { this.spectrum.setOffset(coord); return this; }
+  set(color: ColorInput, ignoreFormatChange: boolean = false) {
+    this.spectrum.set(color, ignoreFormatChange);
+    return this;
+  }
+  get(): ColorInput { return this.spectrum.get() }
+  destroy() {
+    this.spectrum.destroy();
+    // @ts-ignore
+    delete this.ele.__spectrum;
+    return this;
+  }
+
+  rebuild() {
+    this.spectrum.destroy();
+    this.spectrum = spectrum(this.ele, this.options);
+    return this;
+  }
+}
