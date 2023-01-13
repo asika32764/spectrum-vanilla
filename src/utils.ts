@@ -5,7 +5,7 @@
  * @license    __LICENSE__
  */
 
-export function html(html) {
+export function html(html: string) {
   const div = document.createElement('div');
   div.innerHTML = html;
   return div.children[0];
@@ -54,4 +54,34 @@ export function toggleClass(ele: HTMLElement, className: string, state: boolean|
     removeClass(ele, className);
   }
   return ele;
+}
+
+export function emit(ele: EventTarget, eventName: string, detail: any = {}) {
+  const event = new CustomEvent(
+    eventName,
+    {
+      detail
+    }
+  );
+
+  ele.dispatchEvent(event);
+
+  return event;
+}
+
+export function eventDelegate(
+  ele: HTMLElement,
+  eventName: string,
+  selector: string,
+  listener: Function,
+  payload: { [name: string]: any } = {},
+) {
+  ele.addEventListener(eventName, (e) => {
+    if ((e.target as Element).closest(selector)) {
+      // @ts-ignore
+      e.data = Object.assign({}, e.data || {}, payload);
+
+      listener(e);
+    }
+  }, payload);
 }

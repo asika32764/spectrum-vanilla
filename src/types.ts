@@ -15,8 +15,8 @@ export interface Options {
   }
 
   // Options
-  color: boolean;
-  type: string;
+  color: string;
+  type: 'color'|'text'|'component'|'flat';
   showInput: boolean;
   allowEmpty: boolean;
   showButtons: boolean;
@@ -27,7 +27,7 @@ export interface Options {
   hideAfterPaletteSelect: boolean;
   togglePaletteOnly: boolean;
   showSelectionPalette: boolean;
-  localStorageKey: boolean;
+  localStorageKey: string;
   appendTo: string;
   maxSelectionSize: number;
   locale: string;
@@ -37,7 +37,7 @@ export interface Options {
   togglePaletteLessText:string;
   clearText: string;
   noColorSelectedText: string;
-  preferredFormat: string;
+  preferredFormat: "rgb" | "prgb" | "hex" | "hex6" | "hex3" | "hex4" | "hex8" | "name" | "hsl" | "hsv";
   containerClassName: string;
   replacerClassName: string;
   showAlpha: boolean;

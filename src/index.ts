@@ -1,6 +1,7 @@
+import { insertAfter, insertBefore, outerWidthWithMargin, wrap } from './dom';
 import { Options } from './types';
-import { addClass, html, throttle, toggleClass } from './utils';
-import tinycolor from 'tinycolor2';
+import { addClass, emit, eventDelegate, html, removeClass, throttle, toggleClass } from './utils';
+import tinycolor, { ColorInput, Instance } from 'tinycolor2';
 
 const localization: any = {};
 
@@ -14,7 +15,7 @@ const defaultOpts = {
     hide: noop,
 
     // Options
-    color: false,
+    color: '',
     type: '', // text, color, component or flat
     showInput: false,
     allowEmpty: true,
@@ -26,7 +27,7 @@ const defaultOpts = {
     hideAfterPaletteSelect: false,
     togglePaletteOnly: false,
     showSelectionPalette: true,
-    localStorageKey: false,
+    localStorageKey: '',
     appendTo: 'body',
     maxSelectionSize: 8,
     locale: 'en',
@@ -127,7 +128,7 @@ const defaultOpts = {
     ].join('');
   })();
 
-function paletteTemplate(p: string[], color: string, className: string, opts: any) {
+function paletteTemplate(p: ColorInput[], color: ColorInput, className: string, opts: any) {
   const html = [];
   for (let i = 0; i < p.length; i++) {
     const current = p[i];
@@ -197,7 +198,7 @@ function spectrum(element: HTMLInputElement, options: any) {
     currentValue = 0,
     currentAlpha = 1,
     palette: any = [],
-    paletteArray: any = [],
+    paletteArray: any[] = [],
     paletteLookup: any = {},
     selectionPalette = opts.selectionPalette.slice(0),
     maxSelectionSize = opts.maxSelectionSize,
@@ -212,21 +213,21 @@ function spectrum(element: HTMLInputElement, options: any) {
     body = doc.body,
     boundElement: HTMLInputElement = element,
     disabled = false,
-    pickerContainer = container.querySelector('.sp-picker-container'),
-    dragger = container.querySelector('.sp-color'),
-    dragHelper = container.querySelector('.sp-dragger'),
-    slider = container.querySelector('.sp-hue'),
-    slideHelper = container.querySelector('.sp-slider'),
-    alphaSliderInner = container.querySelector('.sp-alpha-inner'),
-    alphaSlider = container.querySelector('.sp-alpha'),
-    alphaSlideHelper = container.querySelector('.sp-alpha-handle'),
-    textInput = container.querySelector('.sp-input'),
-    paletteContainer = container.querySelector('.sp-palette'),
-    initialColorContainer = container.querySelector('.sp-initial'),
-    cancelButton = container.querySelector('.sp-cancel'),
-    clearButton = container.querySelector('.sp-clear'),
-    chooseButton = container.querySelector('.sp-choose'),
-    toggleButton = container.querySelector('.sp-palette-toggle'),
+    pickerContainer = container.querySelector('.sp-picker-container') as HTMLElement,
+    dragger = container.querySelector('.sp-color') as HTMLElement,
+    dragHelper = container.querySelector('.sp-dragger') as HTMLElement,
+    slider = container.querySelector('.sp-hue') as HTMLElement,
+    slideHelper = container.querySelector('.sp-slider') as HTMLElement,
+    alphaSliderInner = container.querySelector('.sp-alpha-inner') as HTMLElement,
+    alphaSlider = container.querySelector('.sp-alpha') as HTMLElement,
+    alphaSlideHelper = container.querySelector('.sp-alpha-handle') as HTMLElement,
+    textInput = container.querySelector('.sp-input') as HTMLInputElement,
+    paletteContainer = container.querySelector('.sp-palette') as HTMLElement,
+    initialColorContainer = container.querySelector('.sp-initial') as HTMLElement,
+    cancelButton = container.querySelector('.sp-cancel') as HTMLElement,
+    clearButton = container.querySelector('.sp-clear') as HTMLElement,
+    chooseButton = container.querySelector('.sp-choose') as HTMLElement,
+    toggleButton = container.querySelector('.sp-palette-toggle') as HTMLElement,
     isInput = boundElement.nodeName === 'INPUT',
     isInputTypeColor = isInput && boundElement.getAttribute('type') === 'color' && inputTypeColorSupport(),
     shouldReplace = isInput && type === 'color',
@@ -237,19 +238,19 @@ function spectrum(element: HTMLInputElement, options: any) {
         })()
       : null,
     offsetElement = (shouldReplace) ? replacer : boundElement,
-    previewElement = replacer?.querySelector('.sp-preview-inner'),
+    previewElement = replacer?.querySelector('.sp-preview-inner') as HTMLElement,
     initialColor = opts.color || (isInput && boundElement.value),
-    colorOnShow = false,
+    colorOnShow: ColorInput = '',
     currentPreferredFormat = opts.preferredFormat,
     clickoutFiresChange = !opts.showButtons || opts.clickoutFiresChange,
     isEmpty = !initialColor,
     allowEmpty = opts.allowEmpty;
 
   // Element to be updated with the input color. Populated in initialize method
-  let originalInputContainer: HTMLElement | null = null,
-    colorizeElement: HTMLElement | null = null,
-    colorizeElementInitialColor: HTMLElement | null = null,
-    colorizeElementInitialBackground: HTMLElement | null = null;
+  let originalInputContainer: HTMLSpanElement;
+  let colorizeElement: HTMLElement;
+  let colorizeElementInitialColor: string;
+  let colorizeElementInitialBackground: string;
 
   //If there is a label for this element, when clicked on, show the colour picker
   const thisId = boundElement.getAttribute('id') || '';
@@ -316,8 +317,9 @@ function spectrum(element: HTMLInputElement, options: any) {
 
     applyOptions();
 
-    originalInputContainer = html('<span class="sp-original-input-container"></span>');
-    [ 'margin' ].forEach(function (cssProp) {
+    originalInputContainer = html('<span class="sp-original-input-container"></span>') as HTMLSpanElement;
+    [ 'margin' ].forEach(function (cssProp: string) {
+      // @ts-ignore
       originalInputContainer.style[cssProp] = boundElement.style[cssProp];
     });
     // inline-flex by default, switching to flex if needed
@@ -326,90 +328,104 @@ function spectrum(element: HTMLInputElement, options: any) {
     }
 
     if (shouldReplace) {
-      boundElement.after(replacer).hide();
+      insertAfter(boundElement, replacer as Element);
+      boundElement.style.display = 'none';
     } else if (type === 'text') {
-      originalInputContainer.addClass('sp-colorize-container');
-      boundElement.addClass('spectrum sp-colorize').wrap(originalInputContainer);
+      addClass(originalInputContainer, 'sp-colorize-container');
+      addClass(boundElement, 'spectrum sp-colorize');
+      wrap(boundElement, originalInputContainer);
     } else if (type === 'component') {
-      boundElement.addClass('spectrum').wrap(originalInputContainer);
-      var addOn = $([ '<div class=\'sp-colorize-container sp-add-on\'>',
+      addClass(boundElement, 'spectrum');
+      wrap(boundElement, originalInputContainer);
+      const addOn = html(['<div class=\'sp-colorize-container sp-add-on\'>',
         '<div class=\'sp-colorize\'></div> ',
-        '</div>' ].join(''));
-      addOn.width(boundElement.outerHeight() + 'px')
-        .css('border-radius', boundElement.css('border-radius'))
-        .css('border', boundElement.css('border'));
-      boundElement.addClass('with-add-on').before(addOn);
+        '</div>'].join('')) as HTMLElement;
+      addOn.style.width = boundElement.offsetHeight + 'px';
+      addOn.style.borderRadius = boundElement.style.borderRadius + 'px';
+      addOn.style.border = boundElement.style.border + 'px';
+      boundElement.classList.add('with-add-on');
+
+      boundElement.before(addOn);
     }
 
-    colorizeElement = boundElement.parent().find('.sp-colorize');
-    colorizeElementInitialColor = colorizeElement.css('color');
-    colorizeElementInitialBackground = colorizeElement.css('background-color');
+    colorizeElement = boundElement.parentNode?.querySelector('.sp-colorize') as HTMLElement;
+    colorizeElementInitialColor = colorizeElement.style.color;
+    colorizeElementInitialBackground = colorizeElement.style.backgroundColor;
 
     if (!allowEmpty) {
-      clearButton.hide();
+      clearButton.style.display = 'none';
     }
 
     if (flat) {
-      boundElement.after(container).hide();
+      boundElement.after(container);
+      boundElement.style.display = 'none';
     } else {
 
-      var appendTo = opts.appendTo === 'parent' ? boundElement.parent() : $(opts.appendTo);
-      if (appendTo.length !== 1) {
-        appendTo = $('body');
+      let appendTo = opts.appendTo === 'parent' ? boundElement.parentElement : opts.appendTo;
+      if (!appendTo) {
+        appendTo = document.body;
       }
 
-      appendTo.append(container);
+      if (typeof appendTo !== 'string') {
+        appendTo.append(container);
+      }
     }
 
     updateSelectionPaletteFromStorage();
 
-    offsetElement.on('click.spectrum touchstart.spectrum', function (e) {
+    function start(e: Event) {
       if (!disabled) {
         show();
       }
 
       e.stopPropagation();
+      const target = e.target as HTMLElement;
 
-      if (!$(e.target).is('input')) {
+      if (!target.matches('input')) {
         e.preventDefault();
       }
-    });
+    }
 
-    if (boundElement.is(':disabled') || (opts.disabled === true)) {
+    offsetElement?.addEventListener('click.spectrum', start);
+    offsetElement?.addEventListener('touchstart.spectrum', start);
+
+    if (boundElement.matches(':disabled') || opts.disabled) {
       disable();
     }
 
     // Prevent clicks from bubbling up to document.  This would cause it to be hidden.
-    container.on('click', stopPropagation);
+    container.addEventListener('click', stopPropagation);
 
     // Handle user typed input
     [ textInput, boundElement ].forEach(function (input) {
-      input.on('change', function () {
-        setFromTextInput(input.val());
+      input.addEventListener('change', () => {
+        setFromTextInput(input.value);
       });
-      input.on('paste', function () {
-        setTimeout(function () {
-          setFromTextInput(input.val());
+      input.addEventListener('paste', () => {
+        setTimeout(() => {
+          setFromTextInput(input.value);
         }, 1);
       });
-      input.on('keydown', function (e) {
-        if (e.keyCode == 13) {
-          setFromTextInput($(input).val());
-          if (input == boundElement) hide();
+      input.addEventListener('keydown', (e) => {
+        if (e.keyCode === 13) {
+          setFromTextInput(input.value);
+          if (input === boundElement) {
+            hide();
+          }
         }
       });
     });
 
-    cancelButton.text(opts.cancelText);
-    cancelButton.on('click.spectrum', function (e) {
+    cancelButton.textContent = opts.cancelText;
+    cancelButton.addEventListener('click.spectrum', function (e) {
       e.stopPropagation();
       e.preventDefault();
       revert();
       hide();
     });
 
-    clearButton.attr('title', opts.clearText);
-    clearButton.on('click.spectrum', function (e) {
+    clearButton.setAttribute('title', opts.clearText);
+    clearButton.addEventListener('click.spectrum', function (e) {
       e.stopPropagation();
       e.preventDefault();
       isEmpty = true;
@@ -421,13 +437,13 @@ function spectrum(element: HTMLInputElement, options: any) {
       }
     });
 
-    chooseButton.text(opts.chooseText);
-    chooseButton.on('click.spectrum', function (e) {
+    chooseButton.textContent = opts.chooseText;
+    chooseButton.addEventListener('click.spectrum', e => {
       e.stopPropagation();
       e.preventDefault();
 
-      if (IE && textInput.is(':focus')) {
-        textInput.trigger('change');
+      if (IE && textInput.matches(':focus')) {
+        textInput.dispatchEvent(new CustomEvent('change'));
       }
 
       if (isValid()) {
@@ -436,8 +452,8 @@ function spectrum(element: HTMLInputElement, options: any) {
       }
     });
 
-    toggleButton.text(opts.showPaletteOnly ? opts.togglePaletteMoreText : opts.togglePaletteLessText);
-    toggleButton.on('click.spectrum', function (e) {
+    toggleButton.textContent = opts.showPaletteOnly ? opts.togglePaletteMoreText : opts.togglePaletteLessText;
+    toggleButton.addEventListener('click.spectrum', e => {
       e.stopPropagation();
       e.preventDefault();
 
@@ -449,7 +465,7 @@ function spectrum(element: HTMLInputElement, options: any) {
       // The 'applyOptions' function puts the whole container back into place
       // and takes care of the button-text and the sp-palette-only CSS class.
       if (!opts.showPaletteOnly && !flat) {
-        container.css('left', '-=' + (pickerContainer.outerWidth(true) + 5));
+        container.style.left =  '-=' + (outerWidthWithMargin(pickerContainer) + 5);
       }
       applyOptions();
     });
@@ -465,7 +481,7 @@ function spectrum(element: HTMLInputElement, options: any) {
     }, dragStart, dragStop);
 
     draggable(slider, function (dragX, dragY) {
-      currentHue = parseFloat(dragY / slideHeight);
+      currentHue = dragY / slideHeight;
       isEmpty = false;
       if (!opts.showAlpha) {
         currentAlpha = 1;
@@ -479,21 +495,21 @@ function spectrum(element: HTMLInputElement, options: any) {
       if (!e.shiftKey) {
         shiftMovementDirection = null;
       } else if (!shiftMovementDirection) {
-        var oldDragX = currentSaturation * dragWidth;
-        var oldDragY = dragHeight - (currentValue * dragHeight);
-        var furtherFromX = Math.abs(dragX - oldDragX) > Math.abs(dragY - oldDragY);
+        const oldDragX = currentSaturation * dragWidth;
+        const oldDragY = dragHeight - (currentValue * dragHeight);
+        const furtherFromX = Math.abs(dragX - oldDragX) > Math.abs(dragY - oldDragY);
 
         shiftMovementDirection = furtherFromX ? 'x' : 'y';
       }
 
-      var setSaturation = !shiftMovementDirection || shiftMovementDirection === 'x';
-      var setValue = !shiftMovementDirection || shiftMovementDirection === 'y';
+      const setSaturation = !shiftMovementDirection || shiftMovementDirection === 'x';
+      const setValue = !shiftMovementDirection || shiftMovementDirection === 'y';
 
       if (setSaturation) {
-        currentSaturation = parseFloat(dragX / dragWidth);
+        currentSaturation = (dragX / dragWidth);
       }
       if (setValue) {
-        currentValue = parseFloat((dragHeight - dragY) / dragHeight);
+        currentValue = ((dragHeight - dragY) / dragHeight);
       }
 
       isEmpty = false;
@@ -524,12 +540,15 @@ function spectrum(element: HTMLInputElement, options: any) {
       show();
     }
 
-    function paletteElementClick(e) {
+    function paletteElementClick(e: Event) {
+      // @ts-ignore
       if (e.data && e.data.ignore) {
-        set($(e.target).closest('.sp-thumb-el').data('color'));
+        const el = (e.target as HTMLElement).closest('.sp-thumb-el') as HTMLElement|null;
+        set(el?.dataset?.color || '');
         move();
       } else {
-        set($(e.target).closest('.sp-thumb-el').data('color'));
+        const el = (e.target as HTMLElement).closest('.sp-thumb-el') as HTMLElement|null;
+        set(el?.dataset?.color || '');
         move();
 
         // If the picker is going to close immediately, a palette selection
@@ -546,8 +565,8 @@ function spectrum(element: HTMLInputElement, options: any) {
     }
 
     var paletteEvent = IE ? 'mousedown.spectrum' : 'click.spectrum touchstart.spectrum';
-    paletteContainer.on(paletteEvent, '.sp-thumb-el', paletteElementClick);
-    initialColorContainer.on(paletteEvent, '.sp-thumb-el:nth-child(1)', { ignore: true }, paletteElementClick);
+    eventDelegate(paletteContainer, paletteEvent, '.sp-thumb-el', paletteElementClick);
+    eventDelegate(initialColorContainer, paletteEvent,  '.sp-thumb-el:nth-child(1)', paletteElementClick, { ignore: true });
   }
 
   function updateSelectionPaletteFromStorage() {
@@ -555,13 +574,14 @@ function spectrum(element: HTMLInputElement, options: any) {
     if (localStorageKey) {
       // Migrate old palettes over to new format.  May want to remove this eventually.
       try {
-        var localStorage = window.localStorage;
-        var oldPalette = localStorage[localStorageKey].split(',#');
+        const localStorage = window.localStorage;
+        const oldPalette = localStorage[localStorageKey].split(',#');
         if (oldPalette.length > 1) {
           delete localStorage[localStorageKey];
-          $.each(oldPalette, function (i, c) {
+
+          for (const c of oldPalette) {
             addColorToSelectionPalette(c);
-          });
+          }
         }
       } catch (e) {
       }
@@ -573,10 +593,11 @@ function spectrum(element: HTMLInputElement, options: any) {
     }
   }
 
-  function addColorToSelectionPalette(color) {
+  function addColorToSelectionPalette(color: ColorInput) {
     if (showSelectionPalette) {
-      var rgb = tinycolor(color).toRgbString();
-      if (!paletteLookup[rgb] && $.inArray(rgb, selectionPalette) === -1) {
+      const rgb = tinycolor(color).toRgbString();
+
+      if (!paletteLookup[rgb] && selectionPalette.includes(rgb)) {
         selectionPalette.push(rgb);
         while (selectionPalette.length > maxSelectionSize) {
           selectionPalette.shift();
@@ -609,9 +630,9 @@ function spectrum(element: HTMLInputElement, options: any) {
 
   function drawPalette() {
 
-    var currentColor = get();
+    const currentColor = get();
 
-    var html = $.map(paletteArray, function (palette, i) {
+    const html = paletteArray.map((palette, i) => {
       return paletteTemplate(palette, currentColor, 'sp-palette-row sp-palette-row-' + i, opts);
     });
 
@@ -621,14 +642,14 @@ function spectrum(element: HTMLInputElement, options: any) {
       html.push(paletteTemplate(getUniqueSelectionPalette(), currentColor, 'sp-palette-row sp-palette-row-selection', opts));
     }
 
-    paletteContainer.html(html.join(''));
+    paletteContainer.innerHTML = html.join('');
   }
 
   function drawInitial() {
     if (opts.showInitial) {
-      var initial = colorOnShow;
-      var current = get();
-      initialColorContainer.html(paletteTemplate([ initial, current ], current, 'sp-palette-row-initial', opts));
+      const initial = colorOnShow;
+      const current = get();
+      initialColorContainer.innerHTML = paletteTemplate([ initial, current ], current, 'sp-palette-row-initial', opts);
     }
   }
 
@@ -637,34 +658,35 @@ function spectrum(element: HTMLInputElement, options: any) {
       reflow();
     }
     isDragging = true;
-    container.addClass(draggingClass);
+    addClass(container, draggingClass);
     shiftMovementDirection = null;
-    boundElement.trigger('dragstart.spectrum', [ get() ]);
+
+    emit(boundElement, 'dragstart.spectrum', [ get() ]);
   }
 
   function dragStop() {
     isDragging = false;
-    container.removeClass(draggingClass);
-    boundElement.trigger('dragstop.spectrum', [ get() ]);
+    removeClass(container, draggingClass);
+    emit(boundElement, 'dragstop.spectrum', [ get() ]);
   }
 
-  function setFromTextInput(value) {
+  function setFromTextInput(value: string) {
     if (abortNextInputChange) {
       abortNextInputChange = false;
       return;
     }
     if ((value === null || value === '') && allowEmpty) {
-      set(null);
+      set('');
       move();
       updateOriginalInput();
     } else {
-      var tiny = tinycolor(value);
+      const tiny = tinycolor(value);
       if (tiny.isValid()) {
         set(tiny);
         move();
         updateOriginalInput();
       } else {
-        textInput.addClass('sp-validation-error');
+        textInput.classList.add('sp-validation-error');
       }
     }
   }
@@ -678,28 +700,26 @@ function spectrum(element: HTMLInputElement, options: any) {
   }
 
   function show() {
-    // debugger;
-    var event = $.Event('beforeShow.spectrum');
-
     if (visible) {
       reflow();
       return;
     }
 
-    boundElement.trigger(event, [ get() ]);
+    const event = emit(boundElement, 'beforeShow.spectrum', [ get() ]);
 
-    if (callbacks.beforeShow(get()) === false || event.isDefaultPrevented()) {
+    if (callbacks.beforeShow(get()) === false || event.defaultPrevented) {
       return;
     }
 
     hideAll();
     visible = true;
 
-    $(doc).on('keydown.spectrum', onkeydown);
-    $(doc).on('click.spectrum', clickout);
-    $(window).on('resize.spectrum', resize);
-    replacer.addClass('sp-active');
-    container.removeClass('sp-hidden');
+
+    doc.addEventListener('keydown', onkeydown);
+    doc.addEventListener('click', clickout);
+    window.addEventListener('resize', resize);
+    replacer?.classList.add('sp-active');
+    container.classList.remove('sp-hidden');
 
     reflow();
     updateUI();
@@ -708,17 +728,17 @@ function spectrum(element: HTMLInputElement, options: any) {
 
     drawInitial();
     callbacks.show(colorOnShow);
-    boundElement.trigger('show.spectrum', [ colorOnShow ]);
+    emit(boundElement, 'show.spectrum', [ colorOnShow ]);
   }
 
-  function onkeydown(e) {
+  function onkeydown(e: KeyboardEvent) {
     // Close on ESC
     if (e.keyCode === 27) {
       hide();
     }
   }
 
-  function clickout(e) {
+  function clickout(e: MouseEvent) {
     // Return on right click.
     if (e.button == 2) {
       return;
@@ -745,15 +765,15 @@ function spectrum(element: HTMLInputElement, options: any) {
     }
     visible = false;
 
-    $(doc).off('keydown.spectrum', onkeydown);
-    $(doc).off('click.spectrum', clickout);
-    $(window).off('resize.spectrum', resize);
+    doc.removeEventListener('keydown', onkeydown);
+    doc.removeEventListener('click', clickout);
+    window.removeEventListener('resize', resize);
 
-    replacer.removeClass('sp-active');
-    container.addClass('sp-hidden');
+    replacer?.classList.remove('sp-active');
+    container.classList.add('sp-hidden');
 
     callbacks.hide(get());
-    boundElement.trigger('hide.spectrum', [ get() ]);
+    emit(boundElement, 'hide.spectrum', [ get() ]);
   }
 
   function revert() {
@@ -761,7 +781,7 @@ function spectrum(element: HTMLInputElement, options: any) {
     updateOriginalInput(true);
   }
 
-  function set(color, ignoreFormatChange) {
+  function set(color: ColorInput, ignoreFormatChange: boolean = false) {
     if (tinycolor.equals(color, get())) {
       // Update UI just in case a validation error needs
       // to be cleared.
@@ -789,11 +809,9 @@ function spectrum(element: HTMLInputElement, options: any) {
     }
   }
 
-  function get(opts) {
-    opts = opts || {};
-
+  function get(opts: any = {}): Instance|'' {
     if (allowEmpty && isEmpty) {
-      return null;
+      return '';
     }
 
     return tinycolor.fromRatio({
@@ -801,32 +819,33 @@ function spectrum(element: HTMLInputElement, options: any) {
       s: currentSaturation,
       v: currentValue,
       a: Math.round(currentAlpha * 1000) / 1000
+      // @ts-ignore
     }, { format: opts.format || currentPreferredFormat });
   }
 
   function isValid() {
-    return !textInput.hasClass('sp-validation-error');
+    return !textInput.classList.contains('sp-validation-error')
   }
 
   function move() {
     updateUI();
 
     callbacks.move(get());
-    boundElement.trigger('move.spectrum', [ get() ]);
+    emit(boundElement, 'move.spectrum', [ get() ]);
   }
 
   function updateUI() {
 
-    textInput.removeClass('sp-validation-error');
+    textInput.classList.remove('sp-validation-error');
 
     updateHelperLocations();
 
     // Update dragger background color (gradients take care of saturation and value).
-    var flatColor = tinycolor.fromRatio({ h: currentHue, s: 1, v: 1 });
-    dragger.css('background-color', flatColor.toHexString());
+    const flatColor = tinycolor.fromRatio({ h: currentHue, s: 1, v: 1 });
+    dragger.style.backgroundColor = flatColor.toHexString();
 
     // Get a format that alpha will be included in (hex and names ignore alpha)
-    var format = currentPreferredFormat;
+    let format = currentPreferredFormat;
     if (currentAlpha < 1 && !(currentAlpha === 0 && format === 'name')) {
       if (format === 'hex' || format === 'hex3' || format === 'hex6' || format === 'name') {
         format = 'rgb';
@@ -837,39 +856,38 @@ function spectrum(element: HTMLInputElement, options: any) {
       displayColor = '';
 
     //reset background info for preview element
-    previewElement.removeClass('sp-clear-display');
-    previewElement.css('background-color', 'transparent');
+    previewElement.classList.remove('sp-clear-display');
+    previewElement.style.backgroundColor = 'transparent';
 
-    if (!realColor && allowEmpty) {
+    if (realColor === '') {
       // Update the replaced elements background with icon indicating no color selection
-      previewElement.addClass('sp-clear-display');
+      previewElement.classList.add('sp-clear-display');
     } else {
-      var realHex = realColor.toHexString(),
-        realRgb = realColor.toRgbString();
+      const realHex = realColor.toHexString();
+      const realRgb = realColor.toRgbString();
 
       // Update the replaced elements background color (with actual selected color)
-      if (rgbaSupport || realColor.alpha === 1) {
-        previewElement.css('background-color', realRgb);
+      if (rgbaSupport || realColor.getAlpha() === 1) {
+        previewElement.style.backgroundColor = realRgb;
       } else {
-        previewElement.css('background-color', 'transparent');
-        previewElement.css('filter', realColor.toFilter());
+        previewElement.style.backgroundColor = 'transparent';
+        previewElement.style.filter = realColor.toFilter();
       }
 
       if (opts.showAlpha) {
-        var rgb = realColor.toRgb();
+        const rgb = realColor.toRgb();
         rgb.a = 0;
-        var realAlpha = tinycolor(rgb).toRgbString();
-        var gradient = 'linear-gradient(left, ' + realAlpha + ', ' + realHex + ')';
+        const realAlpha = tinycolor(rgb).toRgbString();
+        const gradient = 'linear-gradient(left, ' + realAlpha + ', ' + realHex + ')';
 
         if (IE) {
-          alphaSliderInner.css('filter', tinycolor(realAlpha).toFilter({ gradientType: 1 }, realHex));
+          alphaSliderInner.style.filter = tinycolor(realAlpha).toFilter({ gradientType: 1 }, realHex);
         } else {
-          alphaSliderInner.css('background', '-webkit-' + gradient);
-          alphaSliderInner.css('background', '-moz-' + gradient);
-          alphaSliderInner.css('background', '-ms-' + gradient);
+          // alphaSliderInner.css('background', '-webkit-' + gradient);
+          // alphaSliderInner.css('background', '-moz-' + gradient);
+          // alphaSliderInner.css('background', '-ms-' + gradient);
           // Use current syntax gradient on unprefixed property.
-          alphaSliderInner.css('background',
-            'linear-gradient(to right, ' + realAlpha + ', ' + realHex + ')');
+          alphaSliderInner.style.background = `linear-gradient(to right, ${realAlpha}, ${realHex})`;
         }
       }
 
@@ -878,17 +896,18 @@ function spectrum(element: HTMLInputElement, options: any) {
 
     // Update the text entry input as it changes happen
     if (opts.showInput) {
-      textInput.val(displayColor);
+      textInput.value = displayColor;
     }
-    boundElement.val(displayColor);
+    boundElement.value = displayColor;
     if (opts.type == 'text' || opts.type == 'component') {
-      var color = realColor;
+      const color = realColor;
       if (color && colorizeElement) {
-        var textColor = (color.isLight() || color.getAlpha() < 0.4) ? 'black' : 'white';
-        colorizeElement.css('background-color', color.toRgbString()).css('color', textColor);
+        const textColor = (color.isLight() || color.getAlpha() < 0.4) ? 'black' : 'white';
+        colorizeElement.style.backgroundColor = color.toRgbString();
+        colorizeElement.style.color = textColor;
       } else {
-        colorizeElement.css('background-color', colorizeElementInitialBackground)
-          .css('color', colorizeElementInitialColor);
+        colorizeElement.style.backgroundColor = colorizeElementInitialBackground;
+        colorizeElement.style.color = colorizeElementInitialColor;
       }
     }
 
@@ -900,23 +919,23 @@ function spectrum(element: HTMLInputElement, options: any) {
   }
 
   function updateHelperLocations() {
-    var s = currentSaturation;
-    var v = currentValue;
+    const s = currentSaturation;
+    const v = currentValue;
 
     if (allowEmpty && isEmpty) {
       //if selected color is empty, hide the helpers
-      alphaSlideHelper.hide();
-      slideHelper.hide();
-      dragHelper.hide();
+      alphaSlideHelper.style.display = 'none';
+      slideHelper.style.display = 'none';
+      dragHelper.style.display = 'none';
     } else {
       //make sure helpers are visible
-      alphaSlideHelper.show();
-      slideHelper.show();
-      dragHelper.show();
+      alphaSlideHelper.style.display = 'block';
+      slideHelper.style.display = 'block';
+      dragHelper.style.display = 'block';
 
       // Where to show the little circle in that displays your current selected color
-      var dragX = s * dragWidth;
-      var dragY = dragHeight - (v * dragHeight);
+      let dragX = s * dragWidth;
+      let dragY = dragHeight - (v * dragHeight);
       dragX = Math.max(
         -dragHelperHeight,
         Math.min(dragWidth - dragHelperHeight, dragX - dragHelperHeight)
@@ -925,25 +944,19 @@ function spectrum(element: HTMLInputElement, options: any) {
         -dragHelperHeight,
         Math.min(dragHeight - dragHelperHeight, dragY - dragHelperHeight)
       );
-      dragHelper.css({
-        'top': dragY + 'px',
-        'left': dragX + 'px'
-      });
+      dragHelper.style.top = dragY + 'px';
+      dragHelper.style.left = dragX + 'px';
 
-      var alphaX = currentAlpha * alphaWidth;
-      alphaSlideHelper.css({
-        'left': (alphaX - (alphaSlideHelperWidth / 2)) + 'px'
-      });
+      const alphaX = currentAlpha * alphaWidth;
+      alphaSlideHelper.style.left = (alphaX - (alphaSlideHelperWidth / 2)) + 'px';
 
       // Where to show the bar that displays your current selected hue
-      var slideY = (currentHue) * slideHeight;
-      slideHelper.css({
-        'top': (slideY - slideHelperHeight) + 'px'
-      });
+      const slideY = (currentHue) * slideHeight;
+      slideHelper.style.top = (slideY - slideHelperHeight) + 'px';
     }
   }
 
-  function updateOriginalInput(fireCallback) {
+  function updateOriginalInput(fireCallback = false) {
     var color = get(),
       displayColor = '',
       hasChanged = !tinycolor.equals(color, colorOnShow);
@@ -1003,7 +1016,7 @@ function spectrum(element: HTMLInputElement, options: any) {
       colorizeElement.css('background-color', colorizeElementInitialBackground)
         .css('color', colorizeElementInitialColor);
     }
-    var originalInputContainer = boundElement.closest('.sp-original-input-container');
+    const originalInputContainer = boundElement.closest('.sp-original-input-container');
     if (originalInputContainer.length > 0) {
       originalInputContainer.after(boundElement).remove();
     }
@@ -1136,27 +1149,32 @@ function bind(func: Function, obj: object) {
  * Lightweight drag helper.  Handles containment within the element, so that
  * when dragging, the x is within [0,element.width] and y is within [0,element.height]
  */
-function draggable(element, onmove, onstart, onstop) {
+function draggable(
+  element: HTMLElement,
+  onmove: (x: number, y: number, e: DragEvent) => void,
+  onstart: (x: number, y: number, e: DragEvent) => void,
+  onstop: (x: number, y: number, e: DragEvent) => void,
+) {
   onmove = onmove || function () {
   };
   onstart = onstart || function () {
   };
   onstop = onstop || function () {
   };
-  var doc = document;
-  var dragging = false;
-  var offset = {};
-  var maxHeight = 0;
-  var maxWidth = 0;
-  var hasTouch = ('ontouchstart' in window);
+  const doc = document;
+  let dragging = false;
+  let offset = {};
+  let maxHeight = 0;
+  let maxWidth = 0;
+  const hasTouch = ('ontouchstart' in window);
 
-  var duringDragEvents = {};
+  const duringDragEvents: any = {};
   duringDragEvents['selectstart'] = prevent;
   duringDragEvents['dragstart'] = prevent;
   duringDragEvents['touchmove mousemove'] = move;
   duringDragEvents['touchend mouseup'] = stop;
 
-  function prevent(e) {
+  function prevent(e: Event) {
     if (e.stopPropagation) {
       e.stopPropagation();
     }
@@ -1166,7 +1184,7 @@ function draggable(element, onmove, onstart, onstop) {
     e.returnValue = false;
   }
 
-  function move(e) {
+  function move(e: DragEvent) {
     if (dragging) {
       // Mouseup happened outside of window
       if (IE && doc.documentMode < 9 && !e.button) {

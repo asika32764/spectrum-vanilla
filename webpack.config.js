@@ -28,6 +28,10 @@ const config = {
     library: ['Spectrum'],
     sourceMapFilename: "spectrum.js.map"
   },
+  optimization: {
+    concatenateModules: true,
+    // minimize: true,
+  },
   devtool: 'source-map',
   module: {
     rules: [
@@ -48,13 +52,33 @@ const config = {
       },
       {
         test: /\.ts$/,
-        loader: "ts-loader",
-        exclude: /(node_modules|bower_components)/,
-        options:{}
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                [
+                  '@babel/preset-env',
+                  {
+                    targets: 'last 3 version, safari 10, ie 11, not dead',
+                    modules: false
+                  }
+                ],
+              ],
+              plugins: [
+                '@babel/plugin-proposal-class-properties',
+                '@babel/plugin-proposal-optional-chaining',
+              ]
+            }
+          },
+          "ts-loader"
+        ],
+        // exclude: /(node_modules|bower_components)/,
+        // options:{}
       },
       {
         test: /\.m?js$/,
-        exclude: /(node_modules|bower_components)/,
+        // exclude: /(node_modules|bower_components)/,
         use: [{
           loader: 'babel-loader',
           options: {
