@@ -166,7 +166,7 @@ test( "Default Color Is Set By Input Value", function() {
   equal ( noColor.spectrum("get").toHex(), "000000", "Defaults to black with an invalid color");
 
   var noValue = $("<input id='spec' />").spectrum();
-  equal ( noValue.spectrum("get"), null, "Defaults to null with no value set");
+  equal ( noValue.spectrum("get"), '', "Defaults to '' with no value set");
 
   red.spectrum("destroy");
   noColor.spectrum("destroy");
@@ -220,14 +220,17 @@ test( "Palette click events work", function() {
     palette: [
       ["red", "green", "blue"]
     ],
-    show: function(c) {
+    show: function(e) {
+      const c = e.detail.color;
       equal(c.toName(), "orange", "correct shown color");
     },
-    move: function(c) {
+    move: function(e) {
+      const c = e.detail.color;
       equal(c.toName(), moves[moveCount], "Move # " + moveCount + " is correct");
       moveCount++;
     },
-    change: function(c) {
+    change: function(e) {
+      const c = e.detail.color;
       equal(changeCount, 0, "Only one change happens");
       equal(c.toName(), "red");
       changeCount++;
@@ -256,7 +259,8 @@ test( "Palette doesn't changes don't stick if cancelled", function() {
     palette: [
       ["red", "green", "blue"]
     ],
-    move: function(c) {
+    move: function(e) {
+      const c = e.detail.color;
       equal(c.toName(), moves[moveCount], "Move # " + moveCount + " is correct");
       moveCount++;
     },
@@ -295,7 +299,8 @@ test( "hideAfterPaletteSelect: Palette closes after color select when true", fun
   var el = $("<input id='spec' value='orange' />").spectrum({
     showPalette: true,
     hideAfterPaletteSelect: true,
-    change: function(c) {
+    change: function(e) {
+      const c = e.detail.color;
       equal(c.toName(), "red", "change fires");
     },
     palette: [
@@ -367,7 +372,7 @@ test ("clickoutFiresChange", function() {
   equal ( el.spectrum("get").toName(), "red", "Color is initialized");
   el.spectrum("set", "orange");
   equal ( el.spectrum("get").toName(), "orange", "Color is set");
-  $(document).click();
+  triggerEvent(document, 'click');
   equal ( el.spectrum("get").toName(), "red", "Color is reverted after clicking 'cancel'");
   el.spectrum("destroy");
 
@@ -377,7 +382,7 @@ test ("clickoutFiresChange", function() {
   equal ( el.spectrum("get").toName(), "red", "Color is initialized");
   el.spectrum("set", "orange");
   equal ( el.spectrum("get").toName(), "orange", "Color is set");
-  $(document).click();
+  triggerEvent(document, 'click');
   equal ( el.spectrum("get").toName(), "orange", "Color is changed after clicking out");
   el.spectrum("destroy");
 });
@@ -403,7 +408,7 @@ test( "Options Can Be Set and Gotten Programmatically", function() {
 
   var spec = $("<input id='spec' />").spectrum({
     color: "#ECC",
-    flat: true,
+    type: 'flat',
     showInput: true,
     className: "full-spectrum",
     showInitial: true,
@@ -416,7 +421,7 @@ test( "Options Can Be Set and Gotten Programmatically", function() {
   });
 
   var allOptions = spec.spectrum("option");
-  equal ( allOptions.flat, true, "Fetching all options provides accurate value");
+  equal ( allOptions.type === 'flat', true, "Fetching all options provides accurate value");
 
   var singleOption = spec.spectrum("option", "className");
   equal ( singleOption, "full-spectrum", "Fetching a single option returns that value");
@@ -450,7 +455,7 @@ test( "Options Can Be Set and Gotten Programmatically", function() {
 
   var appendToOtherFlat = $("<input  type='color'/>").spectrum({
     appendTo: container,
-    flat: true
+    type: 'flat'
   });
 
   equal ( appendToDefault.spectrum("container").parent()[0], document.body, "Appended to body by default");
@@ -787,18 +792,32 @@ test( "Custom offset", function() {
   el2.spectrum("hide");
 });
 
+/**
+ *
+ * @param {HTMLElement} ele
+ * @param {string|Event} eventName
+ * @param {any} detail
+ * @returns {CustomEvent<{}>|Event}
+ */
 function triggerEvent(ele, eventName, detail = {}) {
   if (ele.jquery) {
     ele = ele[0];
   }
 
-  const event = new CustomEvent(
-    eventName,
-    {
-      cancelable: true,
-      detail,
-    },
-  );
+  let event;
+
+  if (typeof eventName === 'string') {
+    event = new CustomEvent(
+      eventName,
+      {
+        cancelable: true,
+        bubbles: true,
+        detail,
+      },
+    );
+  } else {
+    event = eventName;
+  }
 
   ele.dispatchEvent(event);
 

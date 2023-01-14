@@ -133,6 +133,7 @@ function emit(ele, eventName) {
   let detail = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   const event = new CustomEvent(eventName, {
     cancelable: true,
+    bubbles: true,
     detail
   });
   ele.dispatchEvent(event);
@@ -213,17 +214,6 @@ function getElementPosition(el) {
     left: left - parseInt(marginLeft, 10)
   };
 }
-
-/***/ }),
-
-/***/ "./src/spectrum.scss":
-/*!***************************!*\
-  !*** ./src/spectrum.scss ***!
-  \***************************/
-/***/ (() => {
-
-// extracted by mini-css-extract-plugin
-
 
 /***/ }),
 
@@ -1573,10 +1563,8 @@ var __webpack_exports__ = {};
 /* harmony export */   "default": () => (/* binding */ Spectrum)
 /* harmony export */ });
 /* harmony import */ var tinycolor2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tinycolor2 */ "./node_modules/tinycolor2/esm/tinycolor.js");
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./dom */ "./src/dom.ts");
-/* harmony import */ var _spectrum_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./spectrum.scss */ "./src/spectrum.scss");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/utils.ts");
-
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./dom */ "./src/dom.ts");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/utils.ts");
 
 
 
@@ -1631,7 +1619,7 @@ const defaultOpts = {
     style.cssText = 'background-color:rgba(0,0,0,.5)';
     return contains(style.backgroundColor, 'rgba') || contains(style.backgroundColor, 'hsla');
   })(),
-  replaceInput = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.html)(['<div class=\'sp-replacer\'>', '<div class=\'sp-preview\'><div class=\'sp-preview-inner\'></div></div>', '<div class=\'sp-dd\'>&#9660;</div>', '</div>'].join('')),
+  replaceInput = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.html)(['<div class=\'sp-replacer\'>', '<div class=\'sp-preview\'><div class=\'sp-preview-inner\'></div></div>', '<div class=\'sp-dd\'>&#9660;</div>', '</div>'].join('')),
   markup = function () {
     // IE does not support gradients with multiple stops, so we need to simulate
     //  that for the rainbow slider with 8 divs that each have a single gradient
@@ -1703,7 +1691,7 @@ function spectrum(element, options) {
     localStorageKey = opts.localStorageKey,
     theme = opts.theme,
     callbacks = opts.callbacks,
-    resize = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.throttle)(reflow, 10),
+    resize = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.throttle)(reflow, 10),
     visible = false,
     isDragging = false,
     dragWidth = 0,
@@ -1727,7 +1715,7 @@ function spectrum(element, options) {
     abortNextInputChange = false,
     shiftMovementDirection = null;
   const doc = element.ownerDocument;
-  const container = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.html)(markup, doc);
+  const container = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.html)(markup, doc);
   container.classList.add(theme);
   doc.body.appendChild(container);
   let body = doc.body,
@@ -1752,8 +1740,8 @@ function spectrum(element, options) {
     isInputTypeColor = isInput && boundElement.getAttribute('type') === 'color',
     shouldReplace = isInput && type === 'color',
     replacer = shouldReplace ? (() => {
-      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(replaceInput, theme);
-      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(replaceInput, opts.replacerClassName);
+      (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(replaceInput, theme);
+      (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(replaceInput, opts.replacerClassName);
       return replaceInput;
     })() : null,
     offsetElement = shouldReplace ? replacer : boundElement,
@@ -1804,16 +1792,16 @@ function spectrum(element, options) {
         initialColor = palette[0][0] === '' ? palette[0][0] : Object.keys(paletteLookup)[0];
       }
     }
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-flat', flat);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-input-disabled', !opts.showInput);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-alpha-enabled', opts.showAlpha);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-clear-enabled', allowEmpty);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-buttons-disabled', !opts.showButtons);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-palette-buttons-disabled', !opts.togglePaletteOnly);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-palette-disabled', !opts.showPalette);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-palette-only', opts.showPaletteOnly);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-initial-disabled', !opts.showInitial);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(container, opts.containerClassName);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-flat', flat);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-input-disabled', !opts.showInput);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-alpha-enabled', opts.showAlpha);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-clear-enabled', allowEmpty);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-buttons-disabled', !opts.showButtons);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-palette-buttons-disabled', !opts.togglePaletteOnly);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-palette-disabled', !opts.showPalette);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-palette-only', opts.showPaletteOnly);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-initial-disabled', !opts.showInitial);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(container, opts.containerClassName);
     reflow();
   }
   function offsetElementStart(e) {
@@ -1830,7 +1818,7 @@ function spectrum(element, options) {
     var _a;
     applyOptions();
     const inputStyle = window.getComputedStyle(boundElement);
-    originalInputContainer = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.html)('<span class="sp-original-input-container"></span>');
+    originalInputContainer = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.html)('<span class="sp-original-input-container"></span>');
     ['margin'].forEach(function (cssProp) {
       originalInputContainer.style[cssProp] = inputStyle[cssProp] || null;
     });
@@ -1839,16 +1827,16 @@ function spectrum(element, options) {
       originalInputContainer.style.display = 'flex';
     }
     if (shouldReplace) {
-      (0,_dom__WEBPACK_IMPORTED_MODULE_3__.insertAfter)(boundElement, replacer);
+      (0,_dom__WEBPACK_IMPORTED_MODULE_2__.insertAfter)(boundElement, replacer);
       boundElement.style.display = 'none';
     } else if (type === 'text') {
-      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(originalInputContainer, 'sp-colorize-container');
-      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(boundElement, 'spectrum sp-colorize');
-      (0,_dom__WEBPACK_IMPORTED_MODULE_3__.wrap)(boundElement, originalInputContainer);
+      (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(originalInputContainer, 'sp-colorize-container');
+      (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(boundElement, 'spectrum sp-colorize');
+      (0,_dom__WEBPACK_IMPORTED_MODULE_2__.wrap)(boundElement, originalInputContainer);
     } else if (type === 'component') {
-      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(boundElement, 'spectrum');
-      (0,_dom__WEBPACK_IMPORTED_MODULE_3__.wrap)(boundElement, originalInputContainer);
-      const addOn = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.html)(['<div class=\'sp-colorize-container sp-add-on\'>', '<div class=\'sp-colorize\'></div> ', '</div>'].join(''));
+      (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(boundElement, 'spectrum');
+      (0,_dom__WEBPACK_IMPORTED_MODULE_2__.wrap)(boundElement, originalInputContainer);
+      const addOn = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.html)(['<div class=\'sp-colorize-container sp-add-on\'>', '<div class=\'sp-colorize\'></div> ', '</div>'].join(''));
       addOn.style.width = boundElement.offsetHeight + 'px';
       addOn.style.borderRadius = inputStyle.borderRadius;
       addOn.style.border = inputStyle.border;
@@ -1944,7 +1932,7 @@ function spectrum(element, options) {
       // The 'applyOptions' function puts the whole container back into place
       // and takes care of the button-text and the sp-palette-only CSS class.
       if (!opts.showPaletteOnly && !flat) {
-        container.style.left = '-=' + ((0,_dom__WEBPACK_IMPORTED_MODULE_3__.outerWidthWithMargin)(pickerContainer) + 5);
+        container.style.left = '-=' + ((0,_dom__WEBPACK_IMPORTED_MODULE_2__.outerWidthWithMargin)(pickerContainer) + 5);
       }
       applyOptions();
     });
@@ -2028,8 +2016,8 @@ function spectrum(element, options) {
     }
     const paletteEvents = ['click', 'touchstart'];
     for (const paletteEvent of paletteEvents) {
-      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.eventDelegate)(paletteContainer, paletteEvent, '.sp-thumb-el', paletteElementClick);
-      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.eventDelegate)(initialColorContainer, paletteEvent, '.sp-thumb-el:nth-child(1)', paletteElementClick, {
+      (0,_utils__WEBPACK_IMPORTED_MODULE_1__.eventDelegate)(paletteContainer, paletteEvent, '.sp-thumb-el', paletteElementClick);
+      (0,_utils__WEBPACK_IMPORTED_MODULE_1__.eventDelegate)(initialColorContainer, paletteEvent, '.sp-thumb-el:nth-child(1)', paletteElementClick, {
         ignore: true
       });
     }
@@ -2103,16 +2091,16 @@ function spectrum(element, options) {
       reflow();
     }
     isDragging = true;
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(container, draggingClass);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(container, draggingClass);
     shiftMovementDirection = null;
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'dragstart', {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'dragstart', {
       color: get()
     });
   }
   function dragStop() {
     isDragging = false;
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.removeClass)(container, draggingClass);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'dragstop', {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.removeClass)(container, draggingClass);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'dragstop', {
       color: get()
     });
   }
@@ -2148,7 +2136,7 @@ function spectrum(element, options) {
       reflow();
       return;
     }
-    const event = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'beforeShow', {
+    const event = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'beforeShow', {
       color: get()
     });
     if (callbacks.beforeShow(event) === false || event.defaultPrevented) {
@@ -2165,7 +2153,7 @@ function spectrum(element, options) {
     updateUI();
     colorOnShow = get();
     drawInitial();
-    const e = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'show', {
+    const e = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'show', {
       color: colorOnShow
     });
     callbacks.show(e);
@@ -2204,7 +2192,7 @@ function spectrum(element, options) {
     window.removeEventListener('resize', resize);
     replacer === null || replacer === void 0 ? void 0 : replacer.classList.remove('sp-active');
     container.classList.add('sp-hidden');
-    const event = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'hide', {
+    const event = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'hide', {
       color: get()
     });
     callbacks.hide(event);
@@ -2258,7 +2246,7 @@ function spectrum(element, options) {
   }
   function move() {
     updateUI();
-    const event = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'move', {
+    const event = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'move', {
       color: get()
     });
     callbacks.move(event);
@@ -2381,7 +2369,9 @@ function spectrum(element, options) {
       // we trigger the change event or input, but the input change event is also binded
       // to some spectrum processing, that we do no need
       abortNextInputChange = true;
-      const event = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'change', [color]);
+      const event = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'change', {
+        color
+      });
       callbacks.change(event);
     }
   }
@@ -2401,16 +2391,16 @@ function spectrum(element, options) {
     if (!flat) {
       container.style.position = 'absolute';
       if (opts.offset) {
-        (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setElementOffset)(container, opts.offset);
+        (0,_utils__WEBPACK_IMPORTED_MODULE_1__.setElementOffset)(container, opts.offset);
       } else {
-        (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setElementOffset)(container, getOffset(container, offsetElement));
+        (0,_utils__WEBPACK_IMPORTED_MODULE_1__.setElementOffset)(container, getOffset(container, offsetElement));
       }
     }
     updateHelperLocations();
     if (opts.showPalette) {
       drawPalette();
     }
-    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'reflow');
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'reflow');
   }
   function destroy() {
     boundElement.style.display = 'inline-block';
@@ -2495,7 +2485,7 @@ function getOffset(picker, input) {
   const docElem = doc.documentElement;
   const viewWidth = docElem.clientWidth + window.pageXOffset;
   const viewHeight = docElem.clientHeight + window.pageYOffset;
-  const offset = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.getElementOffset)(input);
+  const offset = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getElementOffset)(input);
   let offsetLeft = offset.left;
   let offsetTop = offset.top;
   offsetTop += inputHeight;
@@ -2581,7 +2571,7 @@ function draggable(element, onmove, onstart, onstop) {
         dragging = true;
         maxHeight = element.getBoundingClientRect().height;
         maxWidth = element.getBoundingClientRect().width;
-        offset = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.getElementOffset)(element);
+        offset = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getElementOffset)(element);
         for (const eventName in duringDragEvents) {
           doc.addEventListener(eventName, duringDragEvents[eventName]);
         }

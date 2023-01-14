@@ -10,7 +10,8 @@
     <link rel="stylesheet" type="text/css" href="dist/spectrum.css">
     <link rel="stylesheet" type="text/css" href="docs/docs.css">
     <link rel="stylesheet" type="text/css" href="docs/highlight/styles/default.css">
-    <link rel="stylesheet" type="text/css" href="docs/highlight/styles/monokai-sublime.css">
+    <link rel="stylesheet" type="text/css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
     <script type="text/javascript" src="docs/jquery-3.6.3.js"></script>
     <script type='text/javascript' src='docs/toc.js'></script>
     <script type='module' src='docs/docs.js'></script>
@@ -226,11 +227,11 @@ Spectrum.getInstance('#picker', {
 
             <pre>
 &lt;script&gt;
-Spectrum.getInstance('.basic');
+Spectrum.getInstanceMultiple('.basic');
 Spectrum.getInstance('.override', {
     color: "yellow"
 });
-('.startEmpty').spectrum({
+Spectrum.getInstance('.startEmpty', {
     allowEmpty: true
 });
 &lt;/script&gt;

@@ -15,10 +15,12 @@
         "ui"
     ],
     "scripts": {
-        "build:prod": "cross-env NODE_ENV=production webpack; cross-env NODE_ENV=production LIB_TARGET=module webpack",
-        "build": "cross-env NODE_ENV=development webpack; cross-env NODE_ENV=development LIB_TARGET=module webpack;",
+        "build:prod": "cross-env NODE_ENV=production webpack && cross-env NODE_ENV=production LIB_TARGET=module webpack",
+        "build": "cross-env NODE_ENV=development webpack && cross-env NODE_ENV=development LIB_TARGET=module webpack;",
         "build:es": "cross-env NODE_ENV=development LIB_TARGET=module webpack",
-        "build:i18n": "cp -r src/i18n dist; cp -r src/i18n-es dist",
+        "build:i18n": "cp -r src/i18n dist && cp -r src/i18n-es dist",
+        "build:css:prod": "node-sass --output-style compressed src/spectrum.scss dist/spectrum.min.css && node-sass --output-style compressed src/spectrum-dark.scss dist/spectrum-dark.min.css",
+        "build:css": "node-sass --source-map true src/spectrum.scss dist/spectrum.css && node-sass --source-map true src/spectrum-dark.scss dist/spectrum-dark.css",
         "watch": "cross-env NODE_ENV=development webpack --watch"
     },
     "homepage": "https://github.com/asika32764/spectrum-vanilla",

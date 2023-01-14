@@ -70,6 +70,7 @@ export function emit(ele: EventTarget, eventName: string, detail: any = {}) {
     eventName,
     {
       cancelable: true,
+      bubbles: true,
       detail,
     },
   );

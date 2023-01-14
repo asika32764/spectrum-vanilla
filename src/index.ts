@@ -1,6 +1,5 @@
 import tinycolor, { ColorInput, Instance } from 'tinycolor2';
 import { insertAfter, outerWidthWithMargin, wrap } from './dom';
-import './spectrum.scss';
 import { ColorFormat, Options, SpLang, SpListener } from './types';
 import {
   addClass,
@@ -1006,7 +1005,7 @@ function spectrum(element: HTMLElement, options: Partial<Options>) {
       // we trigger the change event or input, but the input change event is also binded
       // to some spectrum processing, that we do no need
       abortNextInputChange = true;
-      const event = emit(boundElement, 'change', [color]);
+      const event = emit(boundElement, 'change', { color });
       callbacks.change(event);
     }
   }

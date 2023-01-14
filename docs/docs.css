@@ -29,9 +29,10 @@
 }
 
 :root {
-  --primary-color: #276cb8;
-  --secondary-color: #e83072;
-  --neutral-color:#606c71;
+  --primary-color: #6ea8fe;
+  --secondary-color: #ea868f;
+  --neutral-color: #adb5bd;
+  --bg-color: #2b3035;
 }
 html, body {
   margin: 0;
@@ -42,6 +43,7 @@ html, body {
   line-height: 1.5;
   font-family: 'Nunito', sans-serif;
   color: var(--neutral-color);
+  background-color: var(--bg-color);
 }
 
 /* ---- TABLE OF CONTENT ---- */
@@ -51,19 +53,19 @@ html, body {
   bottom: 0;
   overflow: auto;
   width: 280px;
-  border-right: 1px solid #eeee;
+  /*border-right: 1px solid #eeee;*/
   font-size: .9rem;
 }
 #toc::-webkit-scrollbar-track {
-    background-color: #f6f6f6;;
-    border: 1px solid #f0f0f0;
+    background-color: #465054;
+    border: 1px solid #465054;
 }
 
 #toc::-webkit-scrollbar {
     width: 7px;
 }
 #toc::-webkit-scrollbar-thumb {
-    background-color: #c3c3c3;
+    background-color: #1b1f23;
 }
 #toc ul {
   padding: 0;
@@ -84,9 +86,9 @@ html, body {
 #toc .toc-h1 {
   font-weight: bold;
   text-align: center;
-  font-size: 2rem;
+  font-size: 24px;
   padding: 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #555;
   color: var(--secondary-color);
 }
 #toc .toc-h2 {
@@ -114,7 +116,7 @@ html, body {
 
 /* ---- HEADER ---- */
 #header {
-  border-bottom: 1px solid #eeee;
+  border-bottom: 1px solid #555;
   text-align: center;
   padding-bottom: 1.5rem;
 }
@@ -148,7 +150,7 @@ a:hover {
   text-decoration: underline;
 }
 pre.hljs {
-  background: #373834;
+  /*background: #373834;*/
   border-radius: 5px;
   padding: .8em;
   font-size: 16px;
@@ -158,11 +160,11 @@ strong {
 }
 code {
   padding: 2px 4px;
-  color: #e83072;
+  color: var(--secondary-color);
   white-space: nowrap;
-  background-color: #f7f7f9;
-  border: 1px solid #e1e1e8;
-  font-size: 12px;
+  background-color: rgba(54, 61, 68, 0.77);
+  /*border: 1px solid #e1e1e8;*/
+  font-size: .875rem;
 }
 button {
   background-color: var(--secondary-color);
@@ -181,7 +183,7 @@ button:hover {
 }
 input {
   box-shadow: none;
-  color: inherit;
+  color: var(--bg-color);
   border: 1px solid #cccccc;
   border-radius: 4px;
   padding: .3em .8em;
@@ -192,7 +194,7 @@ input {
   background-color: white;
 }
 .configurator-container {
-  background-color: #f8f8f8;
+  background-color: #1b1f23;
   padding: 1rem;
   /*border: 2px solid #dddfe0;*/
   padding: 1rem;

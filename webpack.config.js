@@ -54,7 +54,6 @@ const config = {
       {
         test: /\.scss$/,
         use: [
-          MiniCssExtractPlugin.loader,
           'css-loader',
           'sass-loader',
         ],
@@ -62,7 +61,6 @@ const config = {
       {
         test: /\.css$/,
         use: [
-          MiniCssExtractPlugin.loader,
           'css-loader',
         ],
       },
@@ -98,14 +96,6 @@ const config = {
     ]
   },
   plugins: [
-    // new webpack.DefinePlugin({
-    //   'process.env': {
-    //     'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-    //   }
-    // }),
-    new MiniCssExtractPlugin({
-      filename: 'spectrum.css',
-    }),
   ]
 };
 
