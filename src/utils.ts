@@ -69,6 +69,7 @@ export function emit(ele: EventTarget, eventName: string, detail: any = {}) {
   const event = new CustomEvent(
     eventName,
     {
+      cancelable: true,
       detail,
     },
   );

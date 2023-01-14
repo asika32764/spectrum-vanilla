@@ -201,7 +201,7 @@ function instanceOptions(options: Partial<Options>, callbackContext: object): Op
   return opts;
 }
 
-function index(element: HTMLElement, options: Partial<Options>) {
+function spectrum(element: HTMLElement, options: Partial<Options>) {
 
   let opts = instanceOptions(options, element),
     type = opts.type,
@@ -605,7 +605,6 @@ function index(element: HTMLElement, options: Partial<Options>) {
   }
 
   function updateSelectionPaletteFromStorage() {
-
     if (localStorageKey) {
       // Migrate old palettes over to new format.  May want to remove this eventually.
       try {
@@ -632,7 +631,7 @@ function index(element: HTMLElement, options: Partial<Options>) {
     if (showSelectionPalette) {
       const rgb = tinycolor(color).toRgbString();
 
-      if (!paletteLookup[rgb] && selectionPalette.includes(rgb)) {
+      if (!paletteLookup[rgb] && !selectionPalette.includes(rgb)) {
         selectionPalette.push(rgb);
         while (selectionPalette.length > maxSelectionSize) {
           selectionPalette.shift();
@@ -1388,7 +1387,7 @@ export default class Spectrum {
   }
 
   constructor(ele: HTMLInputElement, options: Partial<Options> = {}) {
-    this.spectrum = index(ele, options);
+    this.spectrum = spectrum(ele, options);
     this.ele = ele;
     this.options = options;
   }
@@ -1398,7 +1397,12 @@ export default class Spectrum {
   }
 
   get container(): HTMLElement {
-    return this.spectrum.constructor;
+    // @ts-ignore
+    if (!this.ele.__spectrum) {
+      return this.ele;
+    }
+
+    return this.spectrum.container;
   }
 
   show() {
@@ -1436,7 +1440,7 @@ export default class Spectrum {
   }
 
   offset(coord: OffsetCSSOptions) {
-    this.spectrum.setOffset(coord);
+    this.spectrum.offset(coord);
     return this;
   }
 
@@ -1461,7 +1465,7 @@ export default class Spectrum {
     if (options) {
       this.options = Object.assign({}, this.options, options);
     }
-    this.spectrum = index(this.ele, this.options);
+    this.spectrum = spectrum(this.ele, this.options);
     return this;
   }
 
@@ -1542,7 +1546,7 @@ if ($) {
     if (typeof action === "string") {
       let returnValue = this;
       this.each(function () {
-        const spect = Spectrum.getInstance(this);
+        const spect = this.__spectrum;
 
         if (spect) {
           const method = spect[action];
@@ -1554,7 +1558,7 @@ if ($) {
           if (action === "get") {
             returnValue = spect.get();
           } else if (action === "container") {
-            returnValue = spect.container;
+            returnValue = $(spect.container);
           } else if (action === "option") {
             returnValue = spect.option.apply(spect, args);
           } else if (action === "destroy") {

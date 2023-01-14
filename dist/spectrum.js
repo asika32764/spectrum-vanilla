@@ -132,6 +132,7 @@ function toggleClass(ele, className) {
 function emit(ele, eventName) {
   let detail = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   const event = new CustomEvent(eventName, {
+    cancelable: true,
     detail
   });
   ele.dispatchEvent(event);
@@ -1694,7 +1695,7 @@ function instanceOptions(options, callbackContext) {
   };
   return opts;
 }
-function index(element, options) {
+function spectrum(element, options) {
   let opts = instanceOptions(options, element),
     type = opts.type,
     flat = type === 'flat',
@@ -2054,7 +2055,7 @@ function index(element, options) {
   function addColorToSelectionPalette(color) {
     if (showSelectionPalette) {
       const rgb = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(color).toRgbString();
-      if (!paletteLookup[rgb] && selectionPalette.includes(rgb)) {
+      if (!paletteLookup[rgb] && !selectionPalette.includes(rgb)) {
         selectionPalette.push(rgb);
         while (selectionPalette.length > maxSelectionSize) {
           selectionPalette.shift();
@@ -2680,7 +2681,7 @@ class Spectrum {
   constructor(ele) {
     let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     this.eventListeners = {};
-    this.spectrum = index(ele, options);
+    this.spectrum = spectrum(ele, options);
     this.ele = ele;
     this.options = options;
   }
@@ -2688,7 +2689,11 @@ class Spectrum {
     return this.spectrum.id;
   }
   get container() {
-    return this.spectrum.constructor;
+    // @ts-ignore
+    if (!this.ele.__spectrum) {
+      return this.ele;
+    }
+    return this.spectrum.container;
   }
   show() {
     this.spectrum.show();
@@ -2720,7 +2725,7 @@ class Spectrum {
     return this;
   }
   offset(coord) {
-    this.spectrum.setOffset(coord);
+    this.spectrum.offset(coord);
     return this;
   }
   set(color) {
@@ -2742,7 +2747,7 @@ class Spectrum {
     if (options) {
       this.options = Object.assign({}, this.options, options);
     }
-    this.spectrum = index(this.ele, this.options);
+    this.spectrum = spectrum(this.ele, this.options);
     return this;
   }
   destroyInnerObject() {
@@ -2806,7 +2811,7 @@ if ($) {
     if (typeof action === "string") {
       let returnValue = this;
       this.each(function () {
-        const spect = Spectrum.getInstance(this);
+        const spect = this.__spectrum;
         if (spect) {
           const method = spect[action];
           if (!method) {
@@ -2815,7 +2820,7 @@ if ($) {
           if (action === "get") {
             returnValue = spect.get();
           } else if (action === "container") {
-            returnValue = spect.container;
+            returnValue = $(spect.container);
           } else if (action === "option") {
             returnValue = spect.option.apply(spect, args);
           } else if (action === "destroy") {
