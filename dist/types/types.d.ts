@@ -5,19 +5,24 @@ import { OffsetCSSOptions } from './utils';
  * @copyright  Copyright (C) 2023 __ORGANIZATION__.
  * @license    __LICENSE__
  */
+import { Instance as Tinycolor } from 'tinycolor2';
+export type SpEvent = CustomEvent<{
+    color: Tinycolor;
+}>;
+export type SpListener = (event: SpEvent) => any;
 export interface Options {
     callbacks: {
-        beforeShow: Function;
-        move: Function;
-        change: Function;
-        show: Function;
-        hide: Function;
+        beforeShow: SpListener;
+        move: SpListener;
+        change: SpListener;
+        show: SpListener;
+        hide: SpListener;
     };
-    beforeShow?: Function;
-    move?: Function;
-    change?: Function;
-    show?: Function;
-    hide?: Function;
+    beforeShow?: SpListener;
+    move?: SpListener;
+    change?: SpListener;
+    show?: SpListener;
+    hide?: SpListener;
     color: string;
     type: 'color' | 'text' | 'component' | 'flat';
     showInput: boolean;
@@ -33,7 +38,7 @@ export interface Options {
     localStorageKey: string;
     appendTo: string;
     maxSelectionSize: number;
-    locale: string;
+    locale: string | SpLang;
     cancelText: string;
     chooseText: string;
     togglePaletteMoreText: string;
@@ -51,3 +56,11 @@ export interface Options {
     offset: OffsetCSSOptions | null;
 }
 export type ColorFormat = "rgb" | "prgb" | "hex" | "hex6" | "hex3" | "hex4" | "hex8" | "name" | "hsl" | "hsv";
+export interface SpLang {
+    cancelText?: string;
+    chooseText?: string;
+    clearText?: string;
+    togglePaletteMoreText?: string;
+    togglePaletteLessText?: string;
+    noColorSelectedText?: string;
+}

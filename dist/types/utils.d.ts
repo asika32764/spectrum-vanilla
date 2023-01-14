@@ -4,7 +4,7 @@
  * @copyright  Copyright (C) 2023 __ORGANIZATION__.
  * @license    __LICENSE__
  */
-export declare function html(html: string): Element;
+export declare function html(html: string, doc?: Document): Element;
 export declare function camelize(str: string): string;
 export declare function throttle(func: Function, wait: number, debounce?: Function | undefined): () => void;
 export declare function addClass(ele: HTMLElement, className: string): HTMLElement;

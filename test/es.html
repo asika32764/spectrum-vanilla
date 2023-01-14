@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="../docs/jquery-3.6.3.js"></script>
+  <link rel="stylesheet" href="../dist/spectrum.css" />
+</head>
+<body>
+<input type="text" id="color-input" value="#ff6666" />
+
+<script type="module">
+  import Spectrum from './../dist/spectrum.es.js';
+  import zhtw from './../dist/i18n-es/zh-tw.js';
+
+const sp = $('#color-input').spectrum({ locale: zhtw });
+</script>
+</body>
+</html>

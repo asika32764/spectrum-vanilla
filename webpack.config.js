@@ -1,22 +1,28 @@
-const webpack = require('webpack');
 const path = require('path');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const libraryTarget = process.env.LIB_TARGET || 'umd';
-let output = 'spectrum.js';
+let output = 'spectrum';
+
+if (libraryTarget === 'module') {
+  output += '.es';
+}
 
 if (process.env.NODE_ENV === 'production') {
-  if (libraryTarget === 'umd') {
-    output = 'spectrum.min.js';
-  } else {
-    output = 'spectrum.common.js';
-  }
-} else {
-  if (libraryTarget === 'umd') {
-    output = 'spectrum.js';
-  } else {
-    output = 'spectrum.common.js';
-  }
+  output += '.min';
 }
+
+output += '.js';
+
+const library = libraryTarget === 'module'
+  ? {
+    type: libraryTarget,
+  }
+  : {
+    name: 'Spectrum',
+    type: libraryTarget,
+    export: "default",
+  };
 
 const config = {
   mode: process.env.NODE_ENV || 'development',
@@ -24,22 +30,23 @@ const config = {
   output: {
     path: path.resolve('./dist'),
     filename: output,
-    library: {
-      name: 'Spectrum',
-      type: libraryTarget,
-      export: "default",
-    },
+    library,
     globalObject: 'this',
-    sourceMapFilename: "spectrum.js.map",
-    clean: true
+    sourceMapFilename: "[base].map",
   },
   resolve: {
-    extensions: ['.ts', '.js', '.json']
+    extensions: ['.ts', '.js', '.json'],
+    alias: {
+      "@": path.resolve(__dirname, './src/')
+    }
   },
   optimization: {
     usedExports: true,
     // concatenateModules: true,
     // minimize: true,
+  },
+  experiments: {
+    outputModule: libraryTarget === 'module'
   },
   devtool: 'source-map',
   module: {
@@ -47,7 +54,7 @@ const config = {
       {
         test: /\.scss$/,
         use: [
-          'style-loader',
+          MiniCssExtractPlugin.loader,
           'css-loader',
           'sass-loader',
         ],
@@ -55,7 +62,7 @@ const config = {
       {
         test: /\.css$/,
         use: [
-          'style-loader',
+          MiniCssExtractPlugin.loader,
           'css-loader',
         ],
       },
@@ -72,7 +79,7 @@ const config = {
                 [
                   '@babel/preset-env',
                   {
-                    targets: 'last 3 version, safari 10, ie 11, not dead',
+                    targets: '> 0.5%, last 3 versions, not dead',
                     modules: false
                   }
                 ],
@@ -95,7 +102,10 @@ const config = {
     //   'process.env': {
     //     'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
     //   }
-    // })
+    // }),
+    new MiniCssExtractPlugin({
+      filename: 'spectrum.css',
+    }),
   ]
 };
 

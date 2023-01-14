@@ -1,8 +1,7 @@
-import './spectrum.css';
-import tinycolor from 'tinycolor2';
-import { ColorInput, Instance } from 'tinycolor2';
+import tinycolor, { ColorInput, Instance } from 'tinycolor2';
 import { insertAfter, outerWidthWithMargin, wrap } from './dom';
-import { ColorFormat, Options } from './types';
+import './spectrum.scss';
+import { ColorFormat, Options, SpLang, SpListener } from './types';
 import {
   addClass,
   emit,
@@ -16,8 +15,6 @@ import {
   toggleClass,
 } from './utils';
 
-const localization: any = {};
-
 const defaultOpts: Partial<Options> = {
 
     // Callbacks
@@ -29,7 +26,7 @@ const defaultOpts: Partial<Options> = {
 
     // Options
     color: '',
-    type: 'color', // text, color, component or flat
+    type: 'component', // text, color, component or flat
     showInput: false,
     allowEmpty: true,
     showButtons: true,
@@ -56,18 +53,18 @@ const defaultOpts: Partial<Options> = {
     showAlpha: true,
     theme: 'sp-light',
     palette: [
-      [ '#000000', '#444444', '#5b5b5b', '#999999', '#bcbcbc', '#eeeeee', '#f3f6f4', '#ffffff' ],
-      [ '#f44336', '#744700', '#ce7e00', '#8fce00', '#2986cc', '#16537e', '#6a329f', '#c90076' ],
-      [ '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#cfe2f3', '#d9d2e9', '#ead1dc' ],
-      [ '#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#9fc5e8', '#b4a7d6', '#d5a6bd' ],
-      [ '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0' ],
-      [ '#cc0000', '#e69138', '#f1c232', '#6aa84f', '#45818e', '#3d85c6', '#674ea7', '#a64d79' ],
-      [ '#990000', '#b45f06', '#bf9000', '#38761d', '#134f5c', '#0b5394', '#351c75', '#741b47' ],
-      [ '#660000', '#783f04', '#7f6000', '#274e13', '#0c343d', '#073763', '#20124d', '#4c1130' ]
+      ['#000000', '#444444', '#5b5b5b', '#999999', '#bcbcbc', '#eeeeee', '#f3f6f4', '#ffffff'],
+      ['#f44336', '#744700', '#ce7e00', '#8fce00', '#2986cc', '#16537e', '#6a329f', '#c90076'],
+      ['#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#cfe2f3', '#d9d2e9', '#ead1dc'],
+      ['#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#9fc5e8', '#b4a7d6', '#d5a6bd'],
+      ['#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0'],
+      ['#cc0000', '#e69138', '#f1c232', '#6aa84f', '#45818e', '#3d85c6', '#674ea7', '#a64d79'],
+      ['#990000', '#b45f06', '#bf9000', '#38761d', '#134f5c', '#0b5394', '#351c75', '#741b47'],
+      ['#660000', '#783f04', '#7f6000', '#274e13', '#0c343d', '#073763', '#20124d', '#4c1130'],
     ],
     selectionPalette: [] as string[],
     disabled: false,
-    offset: {}
+    offset: null,
   },
   spectrums: any[] = [],
   IE = !!/msie/i.exec(window.navigator.userAgent),
@@ -86,8 +83,8 @@ const defaultOpts: Partial<Options> = {
       '<div class=\'sp-replacer\'>',
       '<div class=\'sp-preview\'><div class=\'sp-preview-inner\'></div></div>',
       '<div class=\'sp-dd\'>&#9660;</div>',
-      '</div>'
-    ].join('')
+      '</div>',
+    ].join(''),
   ) as HTMLElement,
   markup = (function () {
 
@@ -137,7 +134,7 @@ const defaultOpts: Partial<Options> = {
       '<button type=\'button\' class=\'sp-choose\'></button>',
       '</div>',
       '</div>',
-      '</div>'
+      '</div>',
     ].join('');
   })();
 
@@ -162,17 +159,35 @@ function paletteTemplate(p: ColorInput[], color: ColorInput, className: string, 
 function hideAll() {
   for (let i = 0; i < spectrums.length; i++) {
     if (spectrums[i]) {
-      spectrums[i].style.display = 'none';
+      spectrums[i].hide();
     }
   }
 }
 
 function instanceOptions(options: Partial<Options>, callbackContext: object): Options {
   options.locale = options.locale || window.navigator.language;
-  if (options.locale) options.locale = options.locale.split('-')[0].toLowerCase(); // handle locale like "fr-FR"
-  if (options.locale !== 'en' && localization[options.locale]) {
-    options = Object.assign({}, localization[options.locale], options);
+
+  if (typeof options.locale === 'string') {
+    if (options.locale) {
+      // handle locale like "zh-TW" to "zh-tw"
+      // handle locale like "fr-FR" to "fr"
+      let parts = options.locale.split('-')
+        .map((p) => p.toLowerCase());
+
+      if (parts[0] === parts[1]) {
+        parts = [parts[0]];
+      }
+
+      options.locale = parts.join('-');
+    }
+
+    if (options.locale !== 'en' && Spectrum.localization[options.locale]) {
+      options = Object.assign({}, options, Spectrum.localization[options.locale]);
+    }
+  } else {
+    options = Object.assign({}, options, options.locale);
   }
+
   const opts = Object.assign({}, defaultOpts, options) as Options;
 
   opts.callbacks = {
@@ -180,13 +195,13 @@ function instanceOptions(options: Partial<Options>, callbackContext: object): Op
     'change': bind(opts.change as Function, callbackContext),
     'show': bind(opts.show as Function, callbackContext),
     'hide': bind(opts.hide as Function, callbackContext),
-    'beforeShow': bind(opts.beforeShow as Function, callbackContext)
+    'beforeShow': bind(opts.beforeShow as Function, callbackContext),
   };
 
   return opts;
 }
 
-function spectrum(element: HTMLInputElement, options: Partial<Options>) {
+function index(element: HTMLElement, options: Partial<Options>) {
 
   let opts = instanceOptions(options, element),
     type = opts.type,
@@ -219,12 +234,14 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     abortNextInputChange = false,
     shiftMovementDirection: any = null;
 
-  const container = html(markup) as HTMLElement;
-  container.classList.add(theme);
+  const doc = element.ownerDocument;
 
-  let doc = element.ownerDocument,
-    body = doc.body,
-    boundElement: HTMLInputElement = element,
+  const container = html(markup, doc) as HTMLElement;
+  container.classList.add(theme);
+  doc.body.appendChild(container);
+
+  let body = doc.body,
+    boundElement: HTMLElement | HTMLInputElement = element,
     disabled = false,
     pickerContainer = container.querySelector('.sp-picker-container') as HTMLElement,
     dragger = container.querySelector('.sp-color') as HTMLElement,
@@ -246,14 +263,14 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     shouldReplace = isInput && type === 'color',
     replacer = (shouldReplace)
       ? (() => {
-          addClass(replaceInput, theme);
-          addClass(replaceInput, opts.replacerClassName);
-          return replaceInput;
-        })()
+        addClass(replaceInput, theme);
+        addClass(replaceInput, opts.replacerClassName);
+        return replaceInput;
+      })()
       : null,
     offsetElement = (shouldReplace) ? replacer : boundElement,
     previewElement = replacer?.querySelector('.sp-preview-inner') as HTMLElement,
-    initialColor = opts.color || (isInput && boundElement.value),
+    initialColor = opts.color || (isInput && (boundElement as HTMLInputElement).value),
     colorOnShow: ColorInput = '',
     currentPreferredFormat = opts.preferredFormat,
     clickoutFiresChange = !opts.showButtons || opts.clickoutFiresChange,
@@ -262,7 +279,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
 
   // Element to be updated with the input color. Populated in initialize method
   let originalInputContainer: HTMLSpanElement;
-  let colorizeElement: HTMLElement|null;
+  let colorizeElement: HTMLElement | null;
   let colorizeElementInitialColor: string;
   let colorizeElementInitialBackground: string;
 
@@ -274,8 +291,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     labels.forEach((label) => {
       label.addEventListener('click', function (e) {
         e.preventDefault();
-        // Todo: use native
-        boundElement.spectrum('show');
+        show();
         return false;
       });
     });
@@ -293,7 +309,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
 
     if (opts.palette) {
       palette = opts.palette.slice(0);
-      paletteArray = Array.isArray(palette[0]) ? palette : [ palette ];
+      paletteArray = Array.isArray(palette[0]) ? palette : [palette];
       paletteLookup = {};
       for (let i = 0; i < paletteArray.length; i++) {
         for (let j = 0; j < paletteArray[i].length; j++) {
@@ -337,20 +353,16 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
   }
 
   function initialize() {
-
-    if (IE) {
-      container.querySelector('*:not(input)')?.setAttribute('unselectable', 'on');
-    }
-
     applyOptions();
+    const inputStyle = window.getComputedStyle(boundElement);
 
     originalInputContainer = html('<span class="sp-original-input-container"></span>') as HTMLSpanElement;
-    [ 'margin' ].forEach(function (cssProp: string) {
-      // @ts-ignore
-      originalInputContainer.style[cssProp] = boundElement.style[cssProp];
+    ['margin'].forEach(function (cssProp: string) {
+      originalInputContainer.style[cssProp] = inputStyle[cssProp] || null;
     });
     // inline-flex by default, switching to flex if needed
-    if (boundElement.style.display === 'block') {
+
+    if (inputStyle.display === 'block') {
       originalInputContainer.style.display = 'flex';
     }
 
@@ -367,9 +379,11 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
       const addOn = html(['<div class=\'sp-colorize-container sp-add-on\'>',
         '<div class=\'sp-colorize\'></div> ',
         '</div>'].join('')) as HTMLElement;
+
       addOn.style.width = boundElement.offsetHeight + 'px';
-      addOn.style.borderRadius = boundElement.style.borderRadius + 'px';
-      addOn.style.border = boundElement.style.border + 'px';
+      addOn.style.borderRadius = inputStyle.borderRadius;
+      addOn.style.border = inputStyle.border;
+
       boundElement.classList.add('with-add-on');
 
       boundElement.before(addOn);
@@ -411,7 +425,11 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     container.addEventListener('click', (e) => e.stopPropagation());
 
     // Handle user typed input
-    [ textInput, boundElement ].forEach(function (input) {
+    [textInput, boundElement].forEach(function (input: HTMLElement | HTMLInputElement) {
+      if (!('value' in input)) {
+        return;
+      }
+
       input.addEventListener('change', () => {
         setFromTextInput(input.value);
       });
@@ -431,7 +449,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     });
 
     cancelButton.textContent = opts.cancelText;
-    cancelButton.addEventListener('click.spectrum', function (e) {
+    cancelButton.addEventListener('click', function (e) {
       e.stopPropagation();
       e.preventDefault();
       revert();
@@ -439,7 +457,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     });
 
     clearButton.setAttribute('title', opts.clearText);
-    clearButton.addEventListener('click.spectrum', function (e) {
+    clearButton.addEventListener('click', function (e) {
       e.stopPropagation();
       e.preventDefault();
       isEmpty = true;
@@ -452,13 +470,13 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     });
 
     chooseButton.textContent = opts.chooseText;
-    chooseButton.addEventListener('click.spectrum', e => {
+    chooseButton.addEventListener('click', e => {
       e.stopPropagation();
       e.preventDefault();
 
-      if (IE && textInput.matches(':focus')) {
-        textInput.dispatchEvent(new CustomEvent('change'));
-      }
+      // if (IE && textInput.matches(':focus')) {
+      //   textInput.dispatchEvent(new CustomEvent('change'));
+      // }
 
       if (isValid()) {
         updateOriginalInput(true);
@@ -467,7 +485,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     });
 
     toggleButton.textContent = opts.showPaletteOnly ? opts.togglePaletteMoreText : opts.togglePaletteLessText;
-    toggleButton.addEventListener('click.spectrum', e => {
+    toggleButton.addEventListener('click', e => {
       e.stopPropagation();
       e.preventDefault();
 
@@ -479,7 +497,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
       // The 'applyOptions' function puts the whole container back into place
       // and takes care of the button-text and the sp-palette-only CSS class.
       if (!opts.showPaletteOnly && !flat) {
-        container.style.left =  '-=' + (outerWidthWithMargin(pickerContainer) + 5);
+        container.style.left = '-=' + (outerWidthWithMargin(pickerContainer) + 5);
       }
       applyOptions();
     });
@@ -541,7 +559,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
       // In case color was black - update the preview UI and set the format
       // since the set function will not run (default color is black).
       updateUI();
-      currentPreferredFormat = tinycolor(initialColor).format || opts.preferredFormat;
+      currentPreferredFormat = tinycolor(initialColor).getFormat() as ColorFormat || opts.preferredFormat;
       addColorToSelectionPalette(initialColor);
     } else if (initialColor === '') {
       set(initialColor);
@@ -557,11 +575,11 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     function paletteElementClick(e: Event) {
       // @ts-ignore
       if (e.data && e.data.ignore) {
-        const el = (e.target as HTMLElement).closest('.sp-thumb-el') as HTMLElement|null;
+        const el = (e.target as HTMLElement).closest('.sp-thumb-el') as HTMLElement | null;
         set(el?.dataset?.color || '');
         move();
       } else {
-        const el = (e.target as HTMLElement).closest('.sp-thumb-el') as HTMLElement|null;
+        const el = (e.target as HTMLElement).closest('.sp-thumb-el') as HTMLElement | null;
         set(el?.dataset?.color || '');
         move();
 
@@ -578,9 +596,12 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
       return false;
     }
 
-    var paletteEvent = IE ? 'mousedown.spectrum' : 'click.spectrum touchstart.spectrum';
-    eventDelegate(paletteContainer, paletteEvent, '.sp-thumb-el', paletteElementClick);
-    eventDelegate(initialColorContainer, paletteEvent,  '.sp-thumb-el:nth-child(1)', paletteElementClick, { ignore: true });
+    const paletteEvents = ['click', 'touchstart'];
+
+    for (const paletteEvent of paletteEvents) {
+      eventDelegate(paletteContainer, paletteEvent, '.sp-thumb-el', paletteElementClick);
+      eventDelegate(initialColorContainer, paletteEvent, '.sp-thumb-el:nth-child(1)', paletteElementClick, { ignore: true });
+    }
   }
 
   function updateSelectionPaletteFromStorage() {
@@ -663,7 +684,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     if (opts.showInitial) {
       const initial = colorOnShow;
       const current = get();
-      initialColorContainer.innerHTML = paletteTemplate([ initial, current ], current, 'sp-palette-row-initial', opts);
+      initialColorContainer.innerHTML = paletteTemplate([initial, current], current, 'sp-palette-row-initial', opts);
     }
   }
 
@@ -675,13 +696,13 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     addClass(container, draggingClass);
     shiftMovementDirection = null;
 
-    emit(boundElement, 'dragstart.spectrum', [ get() ]);
+    emit(boundElement, 'dragstart', { color: get() });
   }
 
   function dragStop() {
     isDragging = false;
     removeClass(container, draggingClass);
-    emit(boundElement, 'dragstop.spectrum', [ get() ]);
+    emit(boundElement, 'dragstop', { color: get() });
   }
 
   function setFromTextInput(value: string) {
@@ -719,15 +740,14 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
       return;
     }
 
-    const event = emit(boundElement, 'beforeShow.spectrum', [ get() ]);
+    const event = emit(boundElement, 'beforeShow', { color: get() });
 
-    if (callbacks.beforeShow(get()) === false || event.defaultPrevented) {
+    if (callbacks.beforeShow(event) === false || event.defaultPrevented) {
       return;
     }
 
     hideAll();
     visible = true;
-
 
     doc.addEventListener('keydown', onkeydown);
     doc.addEventListener('click', clickout);
@@ -741,8 +761,9 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     colorOnShow = get();
 
     drawInitial();
-    callbacks.show(colorOnShow);
-    emit(boundElement, 'show.spectrum', [ colorOnShow ]);
+
+    const e = emit(boundElement, 'show', { color: colorOnShow });
+    callbacks.show(e);
   }
 
   function onkeydown(e: KeyboardEvent) {
@@ -786,8 +807,8 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     replacer?.classList.remove('sp-active');
     container.classList.add('sp-hidden');
 
-    callbacks.hide(get());
-    emit(boundElement, 'hide.spectrum', [ get() ]);
+    const event = emit(boundElement, 'hide', { color: get() });
+    callbacks.hide(event);
   }
 
   function revert() {
@@ -823,7 +844,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     }
   }
 
-  function get(opts: any = {}): Instance|'' {
+  function get(opts: any = {}): Instance | '' {
     if (allowEmpty && isEmpty) {
       return '';
     }
@@ -832,20 +853,20 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
       h: currentHue,
       s: currentSaturation,
       v: currentValue,
-      a: Math.round(currentAlpha * 1000) / 1000
+      a: Math.round(currentAlpha * 1000) / 1000,
       // @ts-ignore
     }, { format: opts.format || currentPreferredFormat });
   }
 
   function isValid() {
-    return !textInput.classList.contains('sp-validation-error')
+    return !textInput.classList.contains('sp-validation-error');
   }
 
   function move() {
     updateUI();
 
-    callbacks.move(get());
-    emit(boundElement, 'move.spectrum', [ get() ]);
+    const event = emit(boundElement, 'move', { color: get() });
+    callbacks.move(event);
   }
 
   function updateUI() {
@@ -866,26 +887,30 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
       }
     }
 
-    var realColor = get({ format: format }),
+    let realColor = get({ format }),
       displayColor = '';
 
     //reset background info for preview element
-    previewElement.classList.remove('sp-clear-display');
-    previewElement.style.backgroundColor = 'transparent';
+    if (previewElement) {
+      previewElement.classList.remove('sp-clear-display');
+      previewElement.style.backgroundColor = 'transparent';
+    }
 
     if (realColor === '') {
       // Update the replaced elements background with icon indicating no color selection
-      previewElement.classList.add('sp-clear-display');
+      previewElement?.classList.add('sp-clear-display');
     } else {
       const realHex = realColor.toHexString();
       const realRgb = realColor.toRgbString();
 
-      // Update the replaced elements background color (with actual selected color)
-      if (rgbaSupport || realColor.getAlpha() === 1) {
-        previewElement.style.backgroundColor = realRgb;
-      } else {
-        previewElement.style.backgroundColor = 'transparent';
-        previewElement.style.filter = realColor.toFilter();
+      if (previewElement) {
+        // Update the replaced elements background color (with actual selected color)
+        if (rgbaSupport || realColor.getAlpha() === 1) {
+          previewElement.style.backgroundColor = realRgb;
+        } else {
+          previewElement.style.backgroundColor = 'transparent';
+          previewElement.style.filter = realColor.toFilter();
+        }
       }
 
       if (opts.showAlpha) {
@@ -912,7 +937,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     if (opts.showInput) {
       textInput.value = displayColor;
     }
-    boundElement.value = displayColor;
+    (boundElement as HTMLInputElement).value = displayColor;
     if (opts.type == 'text' || opts.type == 'component') {
       const color = realColor;
       if (color && colorizeElement) {
@@ -949,11 +974,11 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
       let dragY = dragHeight - (currentValue * dragHeight);
       dragX = Math.max(
         -dragHelperHeight,
-        Math.min(dragWidth - dragHelperHeight, dragX - dragHelperHeight)
+        Math.min(dragWidth - dragHelperHeight, dragX - dragHelperHeight),
       );
       dragY = Math.max(
         -dragHelperHeight,
-        Math.min(dragHeight - dragHelperHeight, dragY - dragHelperHeight)
+        Math.min(dragHeight - dragHelperHeight, dragY - dragHelperHeight),
       );
       dragHelper.style.top = dragY + 'px';
       dragHelper.style.left = dragX + 'px';
@@ -979,11 +1004,11 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     }
 
     if (fireCallback && hasChanged) {
-      callbacks.change(color);
       // we trigger the change event or input, but the input change event is also binded
       // to some spectrum processing, that we do no need
       abortNextInputChange = true;
-      emit(boundElement, 'change', [ color ]);
+      const event = emit(boundElement, 'change', [color]);
+      callbacks.change(event);
     }
   }
 
@@ -1004,6 +1029,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
 
     if (!flat) {
       container.style.position = 'absolute';
+
       if (opts.offset) {
         setElementOffset(container, opts.offset);
       } else {
@@ -1017,16 +1043,16 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
       drawPalette();
     }
 
-    emit(boundElement, 'reflow.spectrum');
+    emit(boundElement, 'reflow');
   }
 
   function destroy() {
-    boundElement.style.display = 'block';
+    boundElement.style.display = 'inline-block';
     boundElement.classList.remove('spectrum', 'with-add-on', 'sp-colorize');
     offsetElement.removeEventListener('click', offsetElementStart);
     offsetElement.removeEventListener('touchstart', offsetElementStart);
     container.remove();
-    replacer.remove();
+    replacer?.remove();
     if (colorizeElement) {
       colorizeElement.style.backgroundColor = colorizeElementInitialBackground;
       colorizeElement.style.color = colorizeElementInitialColor;
@@ -1039,7 +1065,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     spectrums[spect.id] = null;
   }
 
-  function option(optionName: string|undefined = undefined, optionValue: any = undefined) {
+  function option(optionName: string | undefined = undefined, optionValue: any = undefined) {
     if (optionName === undefined) {
       return Object.assign({}, opts);
     }
@@ -1057,14 +1083,14 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
 
   function enable() {
     disabled = false;
-    boundElement.disabled = false;
+    (boundElement as HTMLInputElement).disabled = false;
     offsetElement.classList.remove('sp-disabled');
   }
 
   function disable() {
     hide();
     disabled = true;
-    boundElement.disabled = true;
+    (boundElement as HTMLInputElement).disabled = true;
     offsetElement.classList.add('sp-disabled');
   }
 
@@ -1091,7 +1117,7 @@ function spectrum(element: HTMLInputElement, options: Partial<Options>) {
     },
     get: get,
     destroy: destroy,
-    container: container
+    container: container,
   };
 
   spect.id = spectrums.push(spect) - 1;
@@ -1108,10 +1134,10 @@ function getOffset(picker: HTMLElement, input: HTMLElement) {
   const dpWidth = picker.offsetWidth;
   const dpHeight = picker.offsetHeight;
   const inputHeight = input.offsetHeight;
-  const doc = picker[0].ownerDocument;
+  const doc = picker.ownerDocument;
   const docElem = doc.documentElement;
-  const viewWidth = docElem.clientWidth + doc.pageXOffset;
-  const viewHeight = docElem.clientHeight + doc.pageYOffset;
+  const viewWidth = docElem.clientWidth + window.pageXOffset;
+  const viewHeight = docElem.clientHeight + window.pageYOffset;
   const offset = getElementOffset(input);
   let offsetLeft = offset.left;
   let offsetTop = offset.top;
@@ -1193,7 +1219,7 @@ function draggable(
     e.returnValue = false;
   }
 
-  function move(e: TouchEvent|MouseEvent) {
+  function move(e: TouchEvent | MouseEvent) {
     if (dragging) {
       // @ts-ignore
       // Mouseup happened outside of window
@@ -1213,11 +1239,11 @@ function draggable(
         prevent(e);
       }
 
-      onmove.apply(element, [ dragX, dragY, e ]);
+      onmove.apply(element, [dragX, dragY, e]);
     }
   }
 
-  function start(e: TouchEvent|MouseEvent) {
+  function start(e: TouchEvent | MouseEvent) {
     const rightclick = (e.which) ? (e.which == 3) : ((e as MouseEvent).button === 2);
 
     if (!rightclick && !dragging) {
@@ -1264,22 +1290,56 @@ export default class Spectrum {
   private spectrum: any;
   public ele: HTMLInputElement;
   public options: Partial<Options>;
+  public eventListeners: { [event: string]: EventListener[] } = {};
 
   static defaultOptions = defaultOpts;
   static draggable = draggable;
+  static localization: { [locale: string]: SpLang } = {};
+  static palette: string[][] = [];
 
-  static create(selector: string|HTMLInputElement, options: Partial<Options> = {}) {
-    return new this(this.wrap(selector), options);
+  static create(selector: string | HTMLElement, options: Partial<Options> = {}): Spectrum {
+    const ele = this.wrap(selector);
+
+    if (!ele) {
+      let msg = 'Unable to find element';
+
+      if (typeof selector === 'string') {
+        msg += ' - Selector: ' + selector;
+      }
+      throw Error(msg);
+    }
+
+    return new this(ele, options);
   }
 
-  static getInstance(selector: string|HTMLInputElement, options: Partial<Options> = {}) {
+  static createIfExists(selector: string | HTMLElement, options: Partial<Options> = {}): Spectrum|null {
+    const ele = this.wrap(selector);
+
+    if (!ele) {
+      return null;
+    }
+
+    return new this(ele, options);
+  }
+
+  static getInstance(selector: string | HTMLElement, options: Partial<Options> = {}): Spectrum {
     const ele = this.wrap(selector);
 
     // @ts-ignore
-    return ele.__spectrum = ele.__spectrum || this.create(ele, options);
+    return ele.__spectrum = ele.__spectrum || this.createIfExists(ele, options);
   }
 
-  static createMultiple(selector: string|NodeListOf<HTMLInputElement>, options: Partial<Options> = {}) {
+  static hasInstance(selector: string | HTMLElement) {
+    const ele = this.wrap(selector);
+
+    // @ts-ignore
+    return ele.__spectrum !== undefined;
+  }
+
+  static createMultiple(
+    selector: string | NodeListOf<HTMLElement>,
+    options: Partial<Options> = {}
+  ) {
     const instances: Spectrum[] = [];
 
     this.wrapList(selector).forEach((ele) => {
@@ -1289,7 +1349,10 @@ export default class Spectrum {
     return instances;
   }
 
-  static getInstanceMultiple(selector: string|NodeListOf<HTMLInputElement>, options: Partial<Options> = {}) {
+  static getInstanceMultiple(
+    selector: string | JQuery | NodeListOf<HTMLElement>,
+    options: Partial<Options> = {},
+  ) {
     const instances: Spectrum[] = [];
 
     this.wrapList(selector).forEach((ele) => {
@@ -1299,24 +1362,33 @@ export default class Spectrum {
     return instances;
   }
 
-  private static wrap(selector: string|HTMLInputElement) {
+  private static wrap(selector: string | JQuery | HTMLElement) {
     if (typeof selector === 'string') {
-      return document.querySelector<HTMLInputElement>(selector);
+      return document.querySelector<HTMLElement>(selector);
+    } else if ((selector as JQuery).jquery) {
+      return selector[0];
     } else {
       return selector;
     }
   }
 
-  private static wrapList(selector: string|NodeListOf<HTMLInputElement>) {
+  private static wrapList(selector: string | JQuery | NodeListOf<HTMLElement>): Array<HTMLElement> {
     if (typeof selector === 'string') {
-      return document.querySelectorAll<HTMLInputElement>(selector);
+      return Array.from(document.querySelectorAll<HTMLElement>(selector));
+    } else if ((selector as JQuery).jquery) {
+      return (selector as JQuery).toArray();
     } else {
-      return selector;
+      return Array.from(selector);
     }
+  }
+
+  static locale(locale: string, localization: SpLang) {
+    this.localization[locale] = localization;
+    return this;
   }
 
   constructor(ele: HTMLInputElement, options: Partial<Options> = {}) {
-    this.spectrum = spectrum(ele, options);
+    this.spectrum = index(ele, options);
     this.ele = ele;
     this.options = options;
   }
@@ -1329,31 +1401,211 @@ export default class Spectrum {
     return this.spectrum.constructor;
   }
 
-  show() { this.spectrum.show(); return this; }
-  hide() { this.spectrum.hide(); return this; }
-  toggle() { this.spectrum.toggle(); return this; }
-  reflow() { this.spectrum.reflow(); return this; }
-  option(optionName: string|undefined = undefined, optionValue: any = undefined): any {
+  show() {
+    this.spectrum.show();
+    return this;
+  }
+
+  hide() {
+    this.spectrum.hide();
+    return this;
+  }
+
+  toggle() {
+    this.spectrum.toggle();
+    return this;
+  }
+
+  reflow() {
+    this.spectrum.reflow();
+    return this;
+  }
+
+  option(optionName: string | undefined = undefined, optionValue: any = undefined): any {
     return this.spectrum.option(optionName, optionValue);
   }
-  enable() { this.spectrum.enable(); return this; }
-  disable() { this.spectrum.disable(); return this; }
-  offset(coord: OffsetCSSOptions) { this.spectrum.setOffset(coord); return this; }
+
+  enable() {
+    this.spectrum.enable();
+    return this;
+  }
+
+  disable() {
+    this.spectrum.disable();
+    return this;
+  }
+
+  offset(coord: OffsetCSSOptions) {
+    this.spectrum.setOffset(coord);
+    return this;
+  }
+
   set(color: ColorInput, ignoreFormatChange: boolean = false) {
     this.spectrum.set(color, ignoreFormatChange);
     return this;
   }
-  get(): ColorInput { return this.spectrum.get() }
+
+  get(): ColorInput {
+    return this.spectrum.get();
+  }
+
   destroy() {
-    this.spectrum.destroy();
+    this.destroyInnerObject();
     // @ts-ignore
     delete this.ele.__spectrum;
     return this;
   }
 
-  rebuild() {
-    this.spectrum.destroy();
-    this.spectrum = spectrum(this.ele, this.options);
+  rebuild(options?: Partial<Options>) {
+    this.destroyInnerObject();
+    if (options) {
+      this.options = Object.assign({}, this.options, options);
+    }
+    this.spectrum = index(this.ele, this.options);
     return this;
   }
+
+  private destroyInnerObject() {
+    this.spectrum.destroy();
+    this.off();
+  }
+
+  listeners(eventName: string) {
+    return this.eventListeners[eventName] || [];
+  }
+
+  on(
+    eventName: string,
+    listener: SpListener,
+    options: AddEventListenerOptions|undefined = undefined
+  ): Function {
+    this.ele.addEventListener(eventName, listener, options);
+
+    this.eventListeners[eventName] = this.eventListeners[eventName] || [];
+
+    this.eventListeners[eventName].push(listener);
+
+    return () => {
+      this.off(eventName, listener);
+    };
+  }
+
+  once(
+    eventName: string,
+    listener: SpListener,
+    options: AddEventListenerOptions|undefined = undefined
+  ): Function {
+    const cancel = this.on(
+      eventName,
+      (e) => {
+        listener(e);
+
+        cancel();
+      },
+      options
+    );
+
+    return cancel;
+  }
+
+  off(eventName: string = undefined, listener: EventListener|SpListener|undefined = undefined) {
+    if (eventName && !this.eventListeners[eventName]) {
+      return;
+    }
+
+    if (!eventName) {
+      this.eventListeners = {};
+      return;
+    }
+
+    if (listener) {
+      this.eventListeners[eventName] = this.eventListeners[eventName]
+        .filter((l) => l === listener);
+
+      this.ele.removeEventListener(eventName, listener);
+    } else {
+      for (const listener of this.eventListeners[eventName]) {
+        this.ele.removeEventListener(eventName, listener);
+      }
+
+      this.eventListeners[eventName] = [];
+    }
+  }
+}
+
+// @ts-ignore
+const $ = window.$;
+
+if ($) {
+  // @ts-ignore
+  $.fn.spectrum = function (action: string | undefined | Partial<Options> = undefined, ...args) {
+    if (typeof action === "string") {
+      let returnValue = this;
+      this.each(function () {
+        const spect = Spectrum.getInstance(this);
+
+        if (spect) {
+          const method = spect[action];
+
+          if (!method) {
+            throw new Error("Spectrum: no such method: '" + action + "'");
+          }
+
+          if (action === "get") {
+            returnValue = spect.get();
+          } else if (action === "container") {
+            returnValue = spect.container;
+          } else if (action === "option") {
+            returnValue = spect.option.apply(spect, args);
+          } else if (action === "destroy") {
+            spect.destroy();
+          } else {
+            spect[action](...args);
+          }
+        }
+      });
+
+      return returnValue;
+    }
+
+    // Initializing a new instance of spectrum
+    return this.each(function () {
+      const options: Options = $.extend({}, $(this).data(), action);
+      // Infer default type from input params and deprecated options
+      if (!$(this).is('input')) {
+        options.type = 'color';
+      } else if (options.type == "flat") {
+        options.type = 'flat';
+      } else if ($(this).attr('type') == 'color') {
+        options.type = 'color';
+      } else {
+        options.type = options.type || 'component';
+      }
+
+      if (Spectrum.hasInstance(this)) {
+        const sp = Spectrum.getInstance(this);
+
+        sp.options = options;
+        sp.rebuild();
+      } else {
+        Spectrum.getInstance(this, options);
+      }
+    });
+  };
+
+  $.fn.spectrum.load = true;
+  $.fn.spectrum.loadOpts = {};
+  $.fn.spectrum.draggable = draggable;
+  $.fn.spectrum.defaults = defaultOpts;
+  $.fn.spectrum.localization = Spectrum.localization;
+  $.fn.spectrum.palette = [];
+
+  $.fn.spectrum.processNativeColorInputs = function () {
+    const colorInputs = $("input[type=color]");
+    if (colorInputs.length) {
+      colorInputs.spectrum({
+        preferredFormat: "hex6"
+      });
+    }
+  };
 }

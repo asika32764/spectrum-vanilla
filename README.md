@@ -1,8 +1,8 @@
-# Spectrum
+# Spectrum Vanilla
 
 ![alt text](https://github.com/seballot/spectrum/blob/master/docs/spectrum.png?raw=true "Preview")
 
-Developed by @bgrins, taken over by @seballot
+Created by @bgrins and @seballot, modified by @asika32764
 
 ### Basic Usage
 

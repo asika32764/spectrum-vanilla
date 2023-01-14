@@ -46,7 +46,7 @@ function wrap(ele, wrapper) {
   return ele;
 }
 function outerWidthWithMargin(ele) {
-  var style = window.getComputedStyle(ele);
+  const style = window.getComputedStyle(ele);
   return ele.getBoundingClientRect().width + parseFloat(style.marginLeft) + parseFloat(style.marginRight);
 }
 
@@ -77,7 +77,8 @@ function outerWidthWithMargin(ele) {
  * @license    __LICENSE__
  */
 function html(html) {
-  var div = document.createElement('div');
+  let doc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
+  const div = doc.createElement('div');
   div.innerHTML = html;
   return div.children[0];
 }
@@ -86,16 +87,14 @@ function camelize(str) {
     return index === 0 ? word.toLowerCase() : word.toUpperCase();
   }).replace(/\s+/g, '');
 }
-function throttle(func, wait, debounce) {
-  if (debounce === void 0) {
-    debounce = undefined;
-  }
-  var timeout;
+function throttle(func, wait) {
+  let debounce = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
+  let timeout;
   return function () {
     // @ts-ignore
-    var context = this,
+    const context = this,
       args = arguments;
-    var throttler = function () {
+    const throttler = function () {
       timeout = null;
       func.apply(context, args);
     };
@@ -106,31 +105,23 @@ function throttle(func, wait, debounce) {
   };
 }
 function addClass(ele, className) {
-  var _a;
-  var classes = className.split(' ').filter(function (c) {
-    return c !== '';
-  });
+  const classes = className.split(' ').filter(c => c !== '');
   if (className !== '' && classes.length) {
-    (_a = ele.classList).add.apply(_a, classes);
+    ele.classList.add(...classes);
   }
   return ele;
 }
 function removeClass(ele, className) {
-  var _a;
-  var classes = className.split(' ').filter(function (c) {
-    return c !== '';
-  });
+  const classes = className.split(' ').filter(c => c !== '');
   if (className !== '' && classes.length) {
-    (_a = ele.classList).remove.apply(_a, classes);
+    ele.classList.remove(...classes);
   }
   return ele;
 }
-function toggleClass(ele, className, state) {
-  if (state === void 0) {
-    state = undefined;
-  }
+function toggleClass(ele, className) {
+  let state = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
   if (state != undefined) {
-    ele.classList.toggle(className);
+    ele.classList.toggle(className, state);
   } else if (state === true) {
     addClass(ele, className);
   } else {
@@ -138,21 +129,17 @@ function toggleClass(ele, className, state) {
   }
   return ele;
 }
-function emit(ele, eventName, detail) {
-  if (detail === void 0) {
-    detail = {};
-  }
-  var event = new CustomEvent(eventName, {
-    detail: detail
+function emit(ele, eventName) {
+  let detail = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  const event = new CustomEvent(eventName, {
+    detail
   });
   ele.dispatchEvent(event);
   return event;
 }
-function eventDelegate(ele, eventName, selector, listener, payload) {
-  if (payload === void 0) {
-    payload = {};
-  }
-  ele.addEventListener(eventName, function (e) {
+function eventDelegate(ele, eventName, selector, listener) {
+  let payload = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+  ele.addEventListener(eventName, e => {
     if (e.target.closest(selector)) {
       // @ts-ignore
       e.data = Object.assign({}, e.data || {}, payload);
@@ -161,20 +148,20 @@ function eventDelegate(ele, eventName, selector, listener, payload) {
   }, payload);
 }
 function setElementOffset(elem, options) {
-  var curPosition;
-  var curTop;
-  var curLeft;
-  var calculatePosition;
-  var position = elem.style.position;
-  var curElem = elem;
-  var props = {};
+  let curPosition;
+  let curTop;
+  let curLeft;
+  let calculatePosition;
+  let position = elem.style.position;
+  let curElem = elem;
+  let props = {};
   // Set position first, in-case top/left are set even on static elem
   if (position === "static") {
     elem.style.position = "relative";
   }
-  var curOffset = getElementOffset(curElem);
-  var curCSSTop = elem.style.top;
-  var curCSSLeft = elem.style.left;
+  let curOffset = getElementOffset(curElem);
+  let curCSSTop = elem.style.top;
+  let curCSSLeft = elem.style.left;
   calculatePosition = (position === "absolute" || position === "fixed") && (curCSSTop + curCSSLeft).indexOf("auto") > -1;
   // Need to be able to calculate position if either
   // top or left is auto and position is either absolute or fixed
@@ -198,31 +185,44 @@ function setElementOffset(elem, options) {
   if ("using" in options) {
     options.using.call(elem, props);
   } else {
-    for (var k in props) {
-      curElem.style[k] = props[k];
+    for (const k in props) {
+      curElem.style[k] = props[k] + 'px';
     }
   }
 }
 function getElementOffset(el) {
-  var box = el.getBoundingClientRect();
-  var docElem = document.documentElement;
+  const box = el.getBoundingClientRect();
+  const docElem = document.documentElement;
   return {
     top: box.top + window.pageYOffset - docElem.clientTop,
     left: box.left + window.pageXOffset - docElem.clientLeft
   };
 }
 function getElementPosition(el) {
-  var _a = el.getBoundingClientRect(),
-    top = _a.top,
-    left = _a.left;
-  var _b = getComputedStyle(el),
-    marginTop = _b.marginTop,
-    marginLeft = _b.marginLeft;
+  const {
+    top,
+    left
+  } = el.getBoundingClientRect();
+  const {
+    marginTop,
+    marginLeft
+  } = getComputedStyle(el);
   return {
     top: top - parseInt(marginTop, 10),
     left: left - parseInt(marginLeft, 10)
   };
 }
+
+/***/ }),
+
+/***/ "./src/spectrum.scss":
+/*!***************************!*\
+  !*** ./src/spectrum.scss ***!
+  \***************************/
+/***/ (() => {
+
+// extracted by mini-css-extract-plugin
+
 
 /***/ }),
 
@@ -1569,17 +1569,17 @@ var __webpack_exports__ = {};
   !*** ./src/index.ts ***!
   \**********************/
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ Spectrum)
 /* harmony export */ });
 /* harmony import */ var tinycolor2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tinycolor2 */ "./node_modules/tinycolor2/esm/tinycolor.js");
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./dom */ "./src/dom.ts");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/utils.ts");
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./dom */ "./src/dom.ts");
+/* harmony import */ var _spectrum_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./spectrum.scss */ "./src/spectrum.scss");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/utils.ts");
 
 
 
 
-var localization = {};
-var defaultOpts = {
+const defaultOpts = {
     // Callbacks
     beforeShow: noop,
     move: noop,
@@ -1588,7 +1588,7 @@ var defaultOpts = {
     hide: noop,
     // Options
     color: '',
-    type: 'color',
+    type: 'component',
     showInput: false,
     allowEmpty: true,
     showButtons: true,
@@ -1617,41 +1617,41 @@ var defaultOpts = {
     palette: [['#000000', '#444444', '#5b5b5b', '#999999', '#bcbcbc', '#eeeeee', '#f3f6f4', '#ffffff'], ['#f44336', '#744700', '#ce7e00', '#8fce00', '#2986cc', '#16537e', '#6a329f', '#c90076'], ['#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#cfe2f3', '#d9d2e9', '#ead1dc'], ['#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#9fc5e8', '#b4a7d6', '#d5a6bd'], ['#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0'], ['#cc0000', '#e69138', '#f1c232', '#6aa84f', '#45818e', '#3d85c6', '#674ea7', '#a64d79'], ['#990000', '#b45f06', '#bf9000', '#38761d', '#134f5c', '#0b5394', '#351c75', '#741b47'], ['#660000', '#783f04', '#7f6000', '#274e13', '#0c343d', '#073763', '#20124d', '#4c1130']],
     selectionPalette: [],
     disabled: false,
-    offset: {}
+    offset: null
   },
   spectrums = [],
   IE = !!/msie/i.exec(window.navigator.userAgent),
-  rgbaSupport = function () {
+  rgbaSupport = (() => {
     function contains(str, substr) {
       return !!~('' + str).indexOf(substr);
     }
-    var elem = document.createElement('div');
-    var style = elem.style;
+    const elem = document.createElement('div');
+    const style = elem.style;
     style.cssText = 'background-color:rgba(0,0,0,.5)';
     return contains(style.backgroundColor, 'rgba') || contains(style.backgroundColor, 'hsla');
-  }(),
-  replaceInput = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.html)(['<div class=\'sp-replacer\'>', '<div class=\'sp-preview\'><div class=\'sp-preview-inner\'></div></div>', '<div class=\'sp-dd\'>&#9660;</div>', '</div>'].join('')),
+  })(),
+  replaceInput = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.html)(['<div class=\'sp-replacer\'>', '<div class=\'sp-preview\'><div class=\'sp-preview-inner\'></div></div>', '<div class=\'sp-dd\'>&#9660;</div>', '</div>'].join('')),
   markup = function () {
     // IE does not support gradients with multiple stops, so we need to simulate
     //  that for the rainbow slider with 8 divs that each have a single gradient
-    var gradientFix = '';
+    let gradientFix = '';
     if (IE) {
-      for (var i = 1; i <= 6; i++) {
+      for (let i = 1; i <= 6; i++) {
         gradientFix += '<div class=\'sp-' + i + '\'></div>';
       }
     }
     return ['<div class=\'sp-container sp-hidden\'>', '<div class=\'sp-palette-container\'>', '<div class=\'sp-palette sp-thumb sp-cf\'></div>', '<div class=\'sp-palette-button-container sp-cf\'>', '<button type=\'button\' class=\'sp-palette-toggle\'></button>', '</div>', '</div>', '<div class=\'sp-picker-container\'>', '<div class=\'sp-top sp-cf\'>', '<div class=\'sp-fill\'></div>', '<div class=\'sp-top-inner\'>', '<div class=\'sp-color\'>', '<div class=\'sp-sat\'>', '<div class=\'sp-val\'>', '<div class=\'sp-dragger\'></div>', '</div>', '</div>', '</div>', '<div class=\'sp-clear sp-clear-display\'>', '</div>', '<div class=\'sp-hue\'>', '<div class=\'sp-slider\'></div>', gradientFix, '</div>', '</div>', '<div class=\'sp-alpha\'><div class=\'sp-alpha-inner\'><div class=\'sp-alpha-handle\'></div></div></div>', '</div>', '<div class=\'sp-input-container sp-cf\'>', '<input class=\'sp-input\' type=\'text\' spellcheck=\'false\'  />', '</div>', '<div class=\'sp-initial sp-thumb sp-cf\'></div>', '<div class=\'sp-button-container sp-cf\'>', '<button class=\'sp-cancel\' href=\'#\'></button>', '<button type=\'button\' class=\'sp-choose\'></button>', '</div>', '</div>', '</div>'].join('');
   }();
 function paletteTemplate(p, color, className, opts) {
-  var html = [];
-  for (var i = 0; i < p.length; i++) {
-    var current = p[i];
+  const html = [];
+  for (let i = 0; i < p.length; i++) {
+    const current = p[i];
     if (current) {
-      var tiny = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(current);
-      var c = tiny.toHsl().l < 0.5 ? 'sp-thumb-el sp-thumb-dark' : 'sp-thumb-el sp-thumb-light';
+      const tiny = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(current);
+      let c = tiny.toHsl().l < 0.5 ? 'sp-thumb-el sp-thumb-dark' : 'sp-thumb-el sp-thumb-light';
       c += tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"].equals(color, current) ? ' sp-thumb-active' : '';
-      var formattedString = tiny.toString(opts.preferredFormat || 'rgb');
-      var swatchStyle = rgbaSupport ? 'background-color:' + tiny.toRgbString() : 'filter:' + tiny.toFilter();
+      const formattedString = tiny.toString(opts.preferredFormat || 'rgb');
+      const swatchStyle = rgbaSupport ? 'background-color:' + tiny.toRgbString() : 'filter:' + tiny.toFilter();
       html.push('<span title="' + formattedString + '" data-color="' + tiny.toRgbString() + '" class="' + c + '"><span class="sp-thumb-inner" style="' + swatchStyle + ';"></span></span>');
     } else {
       html.push('<span class="sp-thumb-el sp-clear-display" ><span class="sp-clear-palette-only" style="background-color: transparent;"></span></span>');
@@ -1660,19 +1660,31 @@ function paletteTemplate(p, color, className, opts) {
   return '<div class=\'sp-cf ' + className + '\'>' + html.join('') + '</div>';
 }
 function hideAll() {
-  for (var i = 0; i < spectrums.length; i++) {
+  for (let i = 0; i < spectrums.length; i++) {
     if (spectrums[i]) {
-      spectrums[i].style.display = 'none';
+      spectrums[i].hide();
     }
   }
 }
 function instanceOptions(options, callbackContext) {
   options.locale = options.locale || window.navigator.language;
-  if (options.locale) options.locale = options.locale.split('-')[0].toLowerCase(); // handle locale like "fr-FR"
-  if (options.locale !== 'en' && localization[options.locale]) {
-    options = Object.assign({}, localization[options.locale], options);
+  if (typeof options.locale === 'string') {
+    if (options.locale) {
+      // handle locale like "zh-TW" to "zh-tw"
+      // handle locale like "fr-FR" to "fr"
+      let parts = options.locale.split('-').map(p => p.toLowerCase());
+      if (parts[0] === parts[1]) {
+        parts = [parts[0]];
+      }
+      options.locale = parts.join('-');
+    }
+    if (options.locale !== 'en' && Spectrum.localization[options.locale]) {
+      options = Object.assign({}, options, Spectrum.localization[options.locale]);
+    }
+  } else {
+    options = Object.assign({}, options, options.locale);
   }
-  var opts = Object.assign({}, defaultOpts, options);
+  const opts = Object.assign({}, defaultOpts, options);
   opts.callbacks = {
     'move': bind(opts.move, callbackContext),
     'change': bind(opts.change, callbackContext),
@@ -1682,15 +1694,15 @@ function instanceOptions(options, callbackContext) {
   };
   return opts;
 }
-function spectrum(element, options) {
-  var opts = instanceOptions(options, element),
+function index(element, options) {
+  let opts = instanceOptions(options, element),
     type = opts.type,
     flat = type === 'flat',
     showSelectionPalette = opts.showSelectionPalette,
     localStorageKey = opts.localStorageKey,
     theme = opts.theme,
     callbacks = opts.callbacks,
-    resize = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.throttle)(reflow, 10),
+    resize = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.throttle)(reflow, 10),
     visible = false,
     isDragging = false,
     dragWidth = 0,
@@ -1713,10 +1725,11 @@ function spectrum(element, options) {
     draggingClass = 'sp-dragging',
     abortNextInputChange = false,
     shiftMovementDirection = null;
-  var container = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.html)(markup);
+  const doc = element.ownerDocument;
+  const container = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.html)(markup, doc);
   container.classList.add(theme);
-  var doc = element.ownerDocument,
-    body = doc.body,
+  doc.body.appendChild(container);
+  let body = doc.body,
     boundElement = element,
     disabled = false,
     pickerContainer = container.querySelector('.sp-picker-container'),
@@ -1737,11 +1750,11 @@ function spectrum(element, options) {
     isInput = boundElement.nodeName === 'INPUT',
     isInputTypeColor = isInput && boundElement.getAttribute('type') === 'color',
     shouldReplace = isInput && type === 'color',
-    replacer = shouldReplace ? function () {
-      (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(replaceInput, theme);
-      (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(replaceInput, opts.replacerClassName);
+    replacer = shouldReplace ? (() => {
+      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(replaceInput, theme);
+      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(replaceInput, opts.replacerClassName);
       return replaceInput;
-    }() : null,
+    })() : null,
     offsetElement = shouldReplace ? replacer : boundElement,
     previewElement = replacer === null || replacer === void 0 ? void 0 : replacer.querySelector('.sp-preview-inner'),
     initialColor = opts.color || isInput && boundElement.value,
@@ -1751,19 +1764,18 @@ function spectrum(element, options) {
     isEmpty = !initialColor,
     allowEmpty = opts.allowEmpty;
   // Element to be updated with the input color. Populated in initialize method
-  var originalInputContainer;
-  var colorizeElement;
-  var colorizeElementInitialColor;
-  var colorizeElementInitialBackground;
+  let originalInputContainer;
+  let colorizeElement;
+  let colorizeElementInitialColor;
+  let colorizeElementInitialBackground;
   //If there is a label for this element, when clicked on, show the colour picker
-  var thisId = boundElement.getAttribute('id') || '';
+  const thisId = boundElement.getAttribute('id') || '';
   if (thisId !== undefined && thisId.length > 0) {
-    var labels = document.querySelectorAll("label[for=\"".concat(thisId, "\"]"));
-    labels.forEach(function (label) {
+    const labels = document.querySelectorAll(`label[for="${thisId}"]`);
+    labels.forEach(label => {
       label.addEventListener('click', function (e) {
         e.preventDefault();
-        // Todo: use native
-        boundElement.spectrum('show');
+        show();
         return false;
       });
     });
@@ -1779,9 +1791,9 @@ function spectrum(element, options) {
       palette = opts.palette.slice(0);
       paletteArray = Array.isArray(palette[0]) ? palette : [palette];
       paletteLookup = {};
-      for (var i = 0; i < paletteArray.length; i++) {
-        for (var j = 0; j < paletteArray[i].length; j++) {
-          var rgb = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(paletteArray[i][j]).toRgbString();
+      for (let i = 0; i < paletteArray.length; i++) {
+        for (let j = 0; j < paletteArray[i].length; j++) {
+          const rgb = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(paletteArray[i][j]).toRgbString();
           paletteLookup[rgb] = true;
         }
       }
@@ -1791,16 +1803,16 @@ function spectrum(element, options) {
         initialColor = palette[0][0] === '' ? palette[0][0] : Object.keys(paletteLookup)[0];
       }
     }
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-flat', flat);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-input-disabled', !opts.showInput);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-alpha-enabled', opts.showAlpha);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-clear-enabled', allowEmpty);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-buttons-disabled', !opts.showButtons);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-palette-buttons-disabled', !opts.togglePaletteOnly);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-palette-disabled', !opts.showPalette);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-palette-only', opts.showPaletteOnly);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.toggleClass)(container, 'sp-initial-disabled', !opts.showInitial);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(container, opts.containerClassName);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-flat', flat);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-input-disabled', !opts.showInput);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-alpha-enabled', opts.showAlpha);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-clear-enabled', allowEmpty);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-buttons-disabled', !opts.showButtons);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-palette-buttons-disabled', !opts.togglePaletteOnly);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-palette-disabled', !opts.showPalette);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-palette-only', opts.showPaletteOnly);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(container, 'sp-initial-disabled', !opts.showInitial);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(container, opts.containerClassName);
     reflow();
   }
   function offsetElementStart(e) {
@@ -1808,44 +1820,41 @@ function spectrum(element, options) {
       show();
     }
     e.stopPropagation();
-    var target = e.target;
+    const target = e.target;
     if (!target.matches('input')) {
       e.preventDefault();
     }
   }
   function initialize() {
-    var _a, _b;
-    if (IE) {
-      (_a = container.querySelector('*:not(input)')) === null || _a === void 0 ? void 0 : _a.setAttribute('unselectable', 'on');
-    }
+    var _a;
     applyOptions();
-    originalInputContainer = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.html)('<span class="sp-original-input-container"></span>');
+    const inputStyle = window.getComputedStyle(boundElement);
+    originalInputContainer = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.html)('<span class="sp-original-input-container"></span>');
     ['margin'].forEach(function (cssProp) {
-      // @ts-ignore
-      originalInputContainer.style[cssProp] = boundElement.style[cssProp];
+      originalInputContainer.style[cssProp] = inputStyle[cssProp] || null;
     });
     // inline-flex by default, switching to flex if needed
-    if (boundElement.style.display === 'block') {
+    if (inputStyle.display === 'block') {
       originalInputContainer.style.display = 'flex';
     }
     if (shouldReplace) {
-      (0,_dom__WEBPACK_IMPORTED_MODULE_2__.insertAfter)(boundElement, replacer);
+      (0,_dom__WEBPACK_IMPORTED_MODULE_3__.insertAfter)(boundElement, replacer);
       boundElement.style.display = 'none';
     } else if (type === 'text') {
-      (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(originalInputContainer, 'sp-colorize-container');
-      (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(boundElement, 'spectrum sp-colorize');
-      (0,_dom__WEBPACK_IMPORTED_MODULE_2__.wrap)(boundElement, originalInputContainer);
+      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(originalInputContainer, 'sp-colorize-container');
+      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(boundElement, 'spectrum sp-colorize');
+      (0,_dom__WEBPACK_IMPORTED_MODULE_3__.wrap)(boundElement, originalInputContainer);
     } else if (type === 'component') {
-      (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(boundElement, 'spectrum');
-      (0,_dom__WEBPACK_IMPORTED_MODULE_2__.wrap)(boundElement, originalInputContainer);
-      var addOn = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.html)(['<div class=\'sp-colorize-container sp-add-on\'>', '<div class=\'sp-colorize\'></div> ', '</div>'].join(''));
+      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(boundElement, 'spectrum');
+      (0,_dom__WEBPACK_IMPORTED_MODULE_3__.wrap)(boundElement, originalInputContainer);
+      const addOn = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.html)(['<div class=\'sp-colorize-container sp-add-on\'>', '<div class=\'sp-colorize\'></div> ', '</div>'].join(''));
       addOn.style.width = boundElement.offsetHeight + 'px';
-      addOn.style.borderRadius = boundElement.style.borderRadius + 'px';
-      addOn.style.border = boundElement.style.border + 'px';
+      addOn.style.borderRadius = inputStyle.borderRadius;
+      addOn.style.border = inputStyle.border;
       boundElement.classList.add('with-add-on');
       boundElement.before(addOn);
     }
-    colorizeElement = (_b = boundElement.parentNode) === null || _b === void 0 ? void 0 : _b.querySelector('.sp-colorize');
+    colorizeElement = (_a = boundElement.parentNode) === null || _a === void 0 ? void 0 : _a.querySelector('.sp-colorize');
     colorizeElementInitialColor = (colorizeElement === null || colorizeElement === void 0 ? void 0 : colorizeElement.style.color) || '';
     colorizeElementInitialBackground = (colorizeElement === null || colorizeElement === void 0 ? void 0 : colorizeElement.style.backgroundColor) || '';
     if (!allowEmpty) {
@@ -1855,7 +1864,7 @@ function spectrum(element, options) {
       boundElement.after(container);
       boundElement.style.display = 'none';
     } else {
-      var appendTo = opts.appendTo === 'parent' ? boundElement.parentElement : opts.appendTo;
+      let appendTo = opts.appendTo === 'parent' ? boundElement.parentElement : opts.appendTo;
       if (!appendTo) {
         appendTo = document.body;
       }
@@ -1870,20 +1879,21 @@ function spectrum(element, options) {
       disable();
     }
     // Prevent clicks from bubbling up to document.  This would cause it to be hidden.
-    container.addEventListener('click', function (e) {
-      return e.stopPropagation();
-    });
+    container.addEventListener('click', e => e.stopPropagation());
     // Handle user typed input
     [textInput, boundElement].forEach(function (input) {
-      input.addEventListener('change', function () {
+      if (!('value' in input)) {
+        return;
+      }
+      input.addEventListener('change', () => {
         setFromTextInput(input.value);
       });
-      input.addEventListener('paste', function () {
-        setTimeout(function () {
+      input.addEventListener('paste', () => {
+        setTimeout(() => {
           setFromTextInput(input.value);
         }, 1);
       });
-      input.addEventListener('keydown', function (e) {
+      input.addEventListener('keydown', e => {
         if (e.keyCode === 13) {
           setFromTextInput(input.value);
           if (input === boundElement) {
@@ -1893,14 +1903,14 @@ function spectrum(element, options) {
       });
     });
     cancelButton.textContent = opts.cancelText;
-    cancelButton.addEventListener('click.spectrum', function (e) {
+    cancelButton.addEventListener('click', function (e) {
       e.stopPropagation();
       e.preventDefault();
       revert();
       hide();
     });
     clearButton.setAttribute('title', opts.clearText);
-    clearButton.addEventListener('click.spectrum', function (e) {
+    clearButton.addEventListener('click', function (e) {
       e.stopPropagation();
       e.preventDefault();
       isEmpty = true;
@@ -1911,19 +1921,19 @@ function spectrum(element, options) {
       }
     });
     chooseButton.textContent = opts.chooseText;
-    chooseButton.addEventListener('click.spectrum', function (e) {
+    chooseButton.addEventListener('click', e => {
       e.stopPropagation();
       e.preventDefault();
-      if (IE && textInput.matches(':focus')) {
-        textInput.dispatchEvent(new CustomEvent('change'));
-      }
+      // if (IE && textInput.matches(':focus')) {
+      //   textInput.dispatchEvent(new CustomEvent('change'));
+      // }
       if (isValid()) {
         updateOriginalInput(true);
         hide();
       }
     });
     toggleButton.textContent = opts.showPaletteOnly ? opts.togglePaletteMoreText : opts.togglePaletteLessText;
-    toggleButton.addEventListener('click.spectrum', function (e) {
+    toggleButton.addEventListener('click', e => {
       e.stopPropagation();
       e.preventDefault();
       opts.showPaletteOnly = !opts.showPaletteOnly;
@@ -1933,7 +1943,7 @@ function spectrum(element, options) {
       // The 'applyOptions' function puts the whole container back into place
       // and takes care of the button-text and the sp-palette-only CSS class.
       if (!opts.showPaletteOnly && !flat) {
-        container.style.left = '-=' + ((0,_dom__WEBPACK_IMPORTED_MODULE_2__.outerWidthWithMargin)(pickerContainer) + 5);
+        container.style.left = '-=' + ((0,_dom__WEBPACK_IMPORTED_MODULE_3__.outerWidthWithMargin)(pickerContainer) + 5);
       }
       applyOptions();
     });
@@ -1958,13 +1968,13 @@ function spectrum(element, options) {
       if (!e.shiftKey) {
         shiftMovementDirection = null;
       } else if (!shiftMovementDirection) {
-        var oldDragX = currentSaturation * dragWidth;
-        var oldDragY = dragHeight - currentValue * dragHeight;
-        var furtherFromX = Math.abs(dragX - oldDragX) > Math.abs(dragY - oldDragY);
+        const oldDragX = currentSaturation * dragWidth;
+        const oldDragY = dragHeight - currentValue * dragHeight;
+        const furtherFromX = Math.abs(dragX - oldDragX) > Math.abs(dragY - oldDragY);
         shiftMovementDirection = furtherFromX ? 'x' : 'y';
       }
-      var setSaturation = !shiftMovementDirection || shiftMovementDirection === 'x';
-      var setValue = !shiftMovementDirection || shiftMovementDirection === 'y';
+      const setSaturation = !shiftMovementDirection || shiftMovementDirection === 'x';
+      const setValue = !shiftMovementDirection || shiftMovementDirection === 'y';
       if (setSaturation) {
         currentSaturation = dragX / dragWidth;
       }
@@ -1982,7 +1992,7 @@ function spectrum(element, options) {
       // In case color was black - update the preview UI and set the format
       // since the set function will not run (default color is black).
       updateUI();
-      currentPreferredFormat = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(initialColor).format || opts.preferredFormat;
+      currentPreferredFormat = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(initialColor).getFormat() || opts.preferredFormat;
       addColorToSelectionPalette(initialColor);
     } else if (initialColor === '') {
       set(initialColor);
@@ -1997,11 +2007,11 @@ function spectrum(element, options) {
       var _a, _b;
       // @ts-ignore
       if (e.data && e.data.ignore) {
-        var el = e.target.closest('.sp-thumb-el');
+        const el = e.target.closest('.sp-thumb-el');
         set(((_a = el === null || el === void 0 ? void 0 : el.dataset) === null || _a === void 0 ? void 0 : _a.color) || '');
         move();
       } else {
-        var el = e.target.closest('.sp-thumb-el');
+        const el = e.target.closest('.sp-thumb-el');
         set(((_b = el === null || el === void 0 ? void 0 : el.dataset) === null || _b === void 0 ? void 0 : _b.color) || '');
         move();
         // If the picker is going to close immediately, a palette selection
@@ -2015,22 +2025,23 @@ function spectrum(element, options) {
       }
       return false;
     }
-    var paletteEvent = IE ? 'mousedown.spectrum' : 'click.spectrum touchstart.spectrum';
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.eventDelegate)(paletteContainer, paletteEvent, '.sp-thumb-el', paletteElementClick);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.eventDelegate)(initialColorContainer, paletteEvent, '.sp-thumb-el:nth-child(1)', paletteElementClick, {
-      ignore: true
-    });
+    const paletteEvents = ['click', 'touchstart'];
+    for (const paletteEvent of paletteEvents) {
+      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.eventDelegate)(paletteContainer, paletteEvent, '.sp-thumb-el', paletteElementClick);
+      (0,_utils__WEBPACK_IMPORTED_MODULE_2__.eventDelegate)(initialColorContainer, paletteEvent, '.sp-thumb-el:nth-child(1)', paletteElementClick, {
+        ignore: true
+      });
+    }
   }
   function updateSelectionPaletteFromStorage() {
     if (localStorageKey) {
       // Migrate old palettes over to new format.  May want to remove this eventually.
       try {
-        var localStorage_1 = window.localStorage;
-        var oldPalette = localStorage_1[localStorageKey].split(',#');
+        const localStorage = window.localStorage;
+        const oldPalette = localStorage[localStorageKey].split(',#');
         if (oldPalette.length > 1) {
-          delete localStorage_1[localStorageKey];
-          for (var _i = 0, oldPalette_1 = oldPalette; _i < oldPalette_1.length; _i++) {
-            var c = oldPalette_1[_i];
+          delete localStorage[localStorageKey];
+          for (const c of oldPalette) {
             addColorToSelectionPalette(c);
           }
         }
@@ -2042,7 +2053,7 @@ function spectrum(element, options) {
   }
   function addColorToSelectionPalette(color) {
     if (showSelectionPalette) {
-      var rgb = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(color).toRgbString();
+      const rgb = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(color).toRgbString();
       if (!paletteLookup[rgb] && selectionPalette.includes(rgb)) {
         selectionPalette.push(rgb);
         while (selectionPalette.length > maxSelectionSize) {
@@ -2069,8 +2080,8 @@ function spectrum(element, options) {
     return unique.reverse().slice(0, opts.maxSelectionSize);
   }
   function drawPalette() {
-    var currentColor = get();
-    var html = paletteArray.map(function (palette, i) {
+    const currentColor = get();
+    const html = paletteArray.map((palette, i) => {
       return paletteTemplate(palette, currentColor, 'sp-palette-row sp-palette-row-' + i, opts);
     });
     updateSelectionPaletteFromStorage();
@@ -2081,8 +2092,8 @@ function spectrum(element, options) {
   }
   function drawInitial() {
     if (opts.showInitial) {
-      var initial = colorOnShow;
-      var current = get();
+      const initial = colorOnShow;
+      const current = get();
       initialColorContainer.innerHTML = paletteTemplate([initial, current], current, 'sp-palette-row-initial', opts);
     }
   }
@@ -2091,14 +2102,18 @@ function spectrum(element, options) {
       reflow();
     }
     isDragging = true;
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(container, draggingClass);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.addClass)(container, draggingClass);
     shiftMovementDirection = null;
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'dragstart.spectrum', [get()]);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'dragstart', {
+      color: get()
+    });
   }
   function dragStop() {
     isDragging = false;
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.removeClass)(container, draggingClass);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'dragstop.spectrum', [get()]);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.removeClass)(container, draggingClass);
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'dragstop', {
+      color: get()
+    });
   }
   function setFromTextInput(value) {
     if (abortNextInputChange) {
@@ -2110,7 +2125,7 @@ function spectrum(element, options) {
       move();
       updateOriginalInput();
     } else {
-      var tiny = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(value);
+      const tiny = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(value);
       if (tiny.isValid()) {
         set(tiny);
         move();
@@ -2132,8 +2147,10 @@ function spectrum(element, options) {
       reflow();
       return;
     }
-    var event = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'beforeShow.spectrum', [get()]);
-    if (callbacks.beforeShow(get()) === false || event.defaultPrevented) {
+    const event = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'beforeShow', {
+      color: get()
+    });
+    if (callbacks.beforeShow(event) === false || event.defaultPrevented) {
       return;
     }
     hideAll();
@@ -2147,8 +2164,10 @@ function spectrum(element, options) {
     updateUI();
     colorOnShow = get();
     drawInitial();
-    callbacks.show(colorOnShow);
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'show.spectrum', [colorOnShow]);
+    const e = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'show', {
+      color: colorOnShow
+    });
+    callbacks.show(e);
   }
   function onkeydown(e) {
     // Close on ESC
@@ -2184,17 +2203,17 @@ function spectrum(element, options) {
     window.removeEventListener('resize', resize);
     replacer === null || replacer === void 0 ? void 0 : replacer.classList.remove('sp-active');
     container.classList.add('sp-hidden');
-    callbacks.hide(get());
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'hide.spectrum', [get()]);
+    const event = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'hide', {
+      color: get()
+    });
+    callbacks.hide(event);
   }
   function revert() {
     set(colorOnShow, true);
     updateOriginalInput(true);
   }
-  function set(color, ignoreFormatChange) {
-    if (ignoreFormatChange === void 0) {
-      ignoreFormatChange = false;
-    }
+  function set(color) {
+    let ignoreFormatChange = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
     if (tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"].equals(color, get())) {
       // Update UI just in case a validation error needs
       // to be cleared.
@@ -2218,10 +2237,8 @@ function spectrum(element, options) {
       currentPreferredFormat = opts.preferredFormat || newColor.getFormat();
     }
   }
-  function get(opts) {
-    if (opts === void 0) {
-      opts = {};
-    }
+  function get() {
+    let opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     if (allowEmpty && isEmpty) {
       return '';
     }
@@ -2240,51 +2257,57 @@ function spectrum(element, options) {
   }
   function move() {
     updateUI();
-    callbacks.move(get());
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'move.spectrum', [get()]);
+    const event = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'move', {
+      color: get()
+    });
+    callbacks.move(event);
   }
   function updateUI() {
     textInput.classList.remove('sp-validation-error');
     updateHelperLocations();
     // Update dragger background color (gradients take care of saturation and value).
-    var flatColor = tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"].fromRatio({
+    const flatColor = tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"].fromRatio({
       h: currentHue,
       s: 1,
       v: 1
     });
     dragger.style.backgroundColor = flatColor.toHexString();
     // Get a format that alpha will be included in (hex and names ignore alpha)
-    var format = currentPreferredFormat;
+    let format = currentPreferredFormat;
     if (currentAlpha < 1 && !(currentAlpha === 0 && format === 'name')) {
       if (format === 'hex' || format === 'hex3' || format === 'hex6' || format === 'name') {
         format = 'rgb';
       }
     }
-    var realColor = get({
-        format: format
+    let realColor = get({
+        format
       }),
       displayColor = '';
     //reset background info for preview element
-    previewElement.classList.remove('sp-clear-display');
-    previewElement.style.backgroundColor = 'transparent';
+    if (previewElement) {
+      previewElement.classList.remove('sp-clear-display');
+      previewElement.style.backgroundColor = 'transparent';
+    }
     if (realColor === '') {
       // Update the replaced elements background with icon indicating no color selection
-      previewElement.classList.add('sp-clear-display');
+      previewElement === null || previewElement === void 0 ? void 0 : previewElement.classList.add('sp-clear-display');
     } else {
-      var realHex = realColor.toHexString();
-      var realRgb = realColor.toRgbString();
-      // Update the replaced elements background color (with actual selected color)
-      if (rgbaSupport || realColor.getAlpha() === 1) {
-        previewElement.style.backgroundColor = realRgb;
-      } else {
-        previewElement.style.backgroundColor = 'transparent';
-        previewElement.style.filter = realColor.toFilter();
+      const realHex = realColor.toHexString();
+      const realRgb = realColor.toRgbString();
+      if (previewElement) {
+        // Update the replaced elements background color (with actual selected color)
+        if (rgbaSupport || realColor.getAlpha() === 1) {
+          previewElement.style.backgroundColor = realRgb;
+        } else {
+          previewElement.style.backgroundColor = 'transparent';
+          previewElement.style.filter = realColor.toFilter();
+        }
       }
       if (opts.showAlpha) {
-        var rgb = realColor.toRgb();
+        const rgb = realColor.toRgb();
         rgb.a = 0;
-        var realAlpha = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(rgb).toRgbString();
-        var gradient = 'linear-gradient(left, ' + realAlpha + ', ' + realHex + ')';
+        const realAlpha = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(rgb).toRgbString();
+        const gradient = 'linear-gradient(left, ' + realAlpha + ', ' + realHex + ')';
         if (IE) {
           alphaSliderInner.style.filter = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(realAlpha).toFilter( /* { gradientType: 1 }, realHex */);
         } else {
@@ -2292,7 +2315,7 @@ function spectrum(element, options) {
           // alphaSliderInner.css('background', '-moz-' + gradient);
           // alphaSliderInner.css('background', '-ms-' + gradient);
           // Use current syntax gradient on unprefixed property.
-          alphaSliderInner.style.background = "linear-gradient(to right, ".concat(realAlpha, ", ").concat(realHex, ")");
+          alphaSliderInner.style.background = `linear-gradient(to right, ${realAlpha}, ${realHex})`;
         }
       }
       displayColor = realColor.toString(format);
@@ -2303,9 +2326,9 @@ function spectrum(element, options) {
     }
     boundElement.value = displayColor;
     if (opts.type == 'text' || opts.type == 'component') {
-      var color = realColor;
+      const color = realColor;
       if (color && colorizeElement) {
-        var textColor = color.isLight() || color.getAlpha() < 0.4 ? 'black' : 'white';
+        const textColor = color.isLight() || color.getAlpha() < 0.4 ? 'black' : 'white';
         colorizeElement.style.backgroundColor = color.toRgbString();
         colorizeElement.style.color = textColor;
       } else {
@@ -2330,24 +2353,22 @@ function spectrum(element, options) {
       slideHelper.style.display = 'block';
       dragHelper.style.display = 'block';
       // Where to show the little circle in that displays your current selected color
-      var dragX = currentSaturation * dragWidth;
-      var dragY = dragHeight - currentValue * dragHeight;
+      let dragX = currentSaturation * dragWidth;
+      let dragY = dragHeight - currentValue * dragHeight;
       dragX = Math.max(-dragHelperHeight, Math.min(dragWidth - dragHelperHeight, dragX - dragHelperHeight));
       dragY = Math.max(-dragHelperHeight, Math.min(dragHeight - dragHelperHeight, dragY - dragHelperHeight));
       dragHelper.style.top = dragY + 'px';
       dragHelper.style.left = dragX + 'px';
-      var alphaX = currentAlpha * alphaWidth;
+      const alphaX = currentAlpha * alphaWidth;
       alphaSlideHelper.style.left = alphaX - alphaSlideHelperWidth / 2 + 'px';
       // Where to show the bar that displays your current selected hue
-      var slideY = currentHue * slideHeight;
+      const slideY = currentHue * slideHeight;
       slideHelper.style.top = slideY - slideHelperHeight + 'px';
     }
   }
-  function updateOriginalInput(fireCallback) {
-    if (fireCallback === void 0) {
-      fireCallback = false;
-    }
-    var color = get(),
+  function updateOriginalInput() {
+    let fireCallback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    let color = get(),
       displayColor = '',
       hasChanged = !tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"].equals(color, colorOnShow);
     if (color) {
@@ -2356,11 +2377,11 @@ function spectrum(element, options) {
       addColorToSelectionPalette(color);
     }
     if (fireCallback && hasChanged) {
-      callbacks.change(color);
       // we trigger the change event or input, but the input change event is also binded
       // to some spectrum processing, that we do no need
       abortNextInputChange = true;
-      (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'change', [color]);
+      const event = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'change', [color]);
+      callbacks.change(event);
     }
   }
   function reflow() {
@@ -2379,42 +2400,38 @@ function spectrum(element, options) {
     if (!flat) {
       container.style.position = 'absolute';
       if (opts.offset) {
-        (0,_utils__WEBPACK_IMPORTED_MODULE_1__.setElementOffset)(container, opts.offset);
+        (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setElementOffset)(container, opts.offset);
       } else {
-        (0,_utils__WEBPACK_IMPORTED_MODULE_1__.setElementOffset)(container, getOffset(container, offsetElement));
+        (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setElementOffset)(container, getOffset(container, offsetElement));
       }
     }
     updateHelperLocations();
     if (opts.showPalette) {
       drawPalette();
     }
-    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'reflow.spectrum');
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__.emit)(boundElement, 'reflow');
   }
   function destroy() {
-    boundElement.style.display = 'block';
+    boundElement.style.display = 'inline-block';
     boundElement.classList.remove('spectrum', 'with-add-on', 'sp-colorize');
     offsetElement.removeEventListener('click', offsetElementStart);
     offsetElement.removeEventListener('touchstart', offsetElementStart);
     container.remove();
-    replacer.remove();
+    replacer === null || replacer === void 0 ? void 0 : replacer.remove();
     if (colorizeElement) {
       colorizeElement.style.backgroundColor = colorizeElementInitialBackground;
       colorizeElement.style.color = colorizeElementInitialColor;
     }
-    var originalInputContainer = boundElement.closest('.sp-original-input-container');
+    const originalInputContainer = boundElement.closest('.sp-original-input-container');
     if (originalInputContainer) {
       originalInputContainer.after(boundElement);
       originalInputContainer.remove();
     }
     spectrums[spect.id] = null;
   }
-  function option(optionName, optionValue) {
-    if (optionName === void 0) {
-      optionName = undefined;
-    }
-    if (optionValue === void 0) {
-      optionValue = undefined;
-    }
+  function option() {
+    let optionName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
+    let optionValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
     if (optionName === undefined) {
       return Object.assign({}, opts);
     }
@@ -2443,7 +2460,7 @@ function spectrum(element, options) {
     reflow();
   }
   initialize();
-  var spect = {
+  let spect = {
     id: 0,
     show: show,
     hide: hide,
@@ -2469,17 +2486,17 @@ function spectrum(element, options) {
  * Thanks https://github.com/jquery/jquery-ui/blob/master/ui/jquery.ui.datepicker.js
  */
 function getOffset(picker, input) {
-  var extraY = 0;
-  var dpWidth = picker.offsetWidth;
-  var dpHeight = picker.offsetHeight;
-  var inputHeight = input.offsetHeight;
-  var doc = picker[0].ownerDocument;
-  var docElem = doc.documentElement;
-  var viewWidth = docElem.clientWidth + doc.pageXOffset;
-  var viewHeight = docElem.clientHeight + doc.pageYOffset;
-  var offset = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getElementOffset)(input);
-  var offsetLeft = offset.left;
-  var offsetTop = offset.top;
+  const extraY = 0;
+  const dpWidth = picker.offsetWidth;
+  const dpHeight = picker.offsetHeight;
+  const inputHeight = input.offsetHeight;
+  const doc = picker.ownerDocument;
+  const docElem = doc.documentElement;
+  const viewWidth = docElem.clientWidth + window.pageXOffset;
+  const viewHeight = docElem.clientHeight + window.pageYOffset;
+  const offset = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.getElementOffset)(input);
+  let offsetLeft = offset.left;
+  let offsetTop = offset.top;
   offsetTop += inputHeight;
   offsetLeft -= Math.min(offsetLeft, offsetLeft + dpWidth > viewWidth && viewWidth > dpWidth ? Math.abs(offsetLeft + dpWidth - viewWidth) : 0);
   offsetTop -= Math.min(offsetTop, offsetTop + dpHeight > viewHeight && viewHeight > dpHeight ? Math.abs(dpHeight + inputHeight - extraY) : extraY);
@@ -2501,8 +2518,8 @@ function noop() {}
  * Thanks to underscore.js
  */
 function bind(func, obj) {
-  var slice = Array.prototype.slice;
-  var args = slice.call(arguments, 2);
+  const slice = Array.prototype.slice;
+  const args = slice.call(arguments, 2);
   return function () {
     return func.apply(obj, args.concat(slice.call(arguments)));
   };
@@ -2515,13 +2532,13 @@ function draggable(element, onmove, onstart, onstop) {
   onmove = onmove || noop;
   onstart = onstart || noop;
   onstop = onstop || noop;
-  var doc = document;
-  var dragging = false;
-  var offset = {};
-  var maxHeight = 0;
-  var maxWidth = 0;
-  var hasTouch = ('ontouchstart' in window);
-  var duringDragEvents = {};
+  const doc = document;
+  let dragging = false;
+  let offset = {};
+  let maxHeight = 0;
+  let maxWidth = 0;
+  const hasTouch = ('ontouchstart' in window);
+  const duringDragEvents = {};
   duringDragEvents['selectstart'] = prevent;
   duringDragEvents['dragstart'] = prevent;
   duringDragEvents['touchmove'] = move;
@@ -2544,11 +2561,11 @@ function draggable(element, onmove, onstart, onstop) {
       if (IE && doc.documentMode < 9 && !e.button) {
         return stop();
       }
-      var t0 = 'touches' in e && e.touches[0];
-      var pageX = t0 && t0.pageX || e.pageX;
-      var pageY = t0 && t0.pageY || e.pageY;
-      var dragX = Math.max(0, Math.min(pageX - offset.left, maxWidth));
-      var dragY = Math.max(0, Math.min(pageY - offset.top, maxHeight));
+      const t0 = 'touches' in e && e.touches[0];
+      const pageX = t0 && t0.pageX || e.pageX;
+      const pageY = t0 && t0.pageY || e.pageY;
+      const dragX = Math.max(0, Math.min(pageX - offset.left, maxWidth));
+      const dragY = Math.max(0, Math.min(pageY - offset.top, maxHeight));
       if (hasTouch) {
         // Stop scrolling in iOS
         prevent(e);
@@ -2557,14 +2574,14 @@ function draggable(element, onmove, onstart, onstop) {
     }
   }
   function start(e) {
-    var rightclick = e.which ? e.which == 3 : e.button === 2;
+    const rightclick = e.which ? e.which == 3 : e.button === 2;
     if (!rightclick && !dragging) {
       if (onstart.apply(element, arguments) !== false) {
         dragging = true;
         maxHeight = element.getBoundingClientRect().height;
         maxWidth = element.getBoundingClientRect().width;
-        offset = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getElementOffset)(element);
-        for (var eventName in duringDragEvents) {
+        offset = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.getElementOffset)(element);
+        for (const eventName in duringDragEvents) {
           doc.addEventListener(eventName, duringDragEvents[eventName]);
         }
         doc.body.classList.add('sp-dragging');
@@ -2575,7 +2592,7 @@ function draggable(element, onmove, onstart, onstop) {
   }
   function stop() {
     if (dragging) {
-      for (var eventName in duringDragEvents) {
+      for (const eventName in duringDragEvents) {
         doc.removeEventListener(eventName, duringDragEvents[eventName]);
       }
       doc.body.classList.remove('sp-dragging');
@@ -2590,142 +2607,263 @@ function draggable(element, onmove, onstart, onstop) {
   element.addEventListener('touchstart', start);
   element.addEventListener('mousedown', start);
 }
-var Spectrum = /** @class */function () {
-  function Spectrum(ele, options) {
-    if (options === void 0) {
-      options = {};
+class Spectrum {
+  static create(selector) {
+    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    const ele = this.wrap(selector);
+    if (!ele) {
+      let msg = 'Unable to find element';
+      if (typeof selector === 'string') {
+        msg += ' - Selector: ' + selector;
+      }
+      throw Error(msg);
     }
-    this.spectrum = spectrum(ele, options);
+    return new this(ele, options);
+  }
+  static createIfExists(selector) {
+    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    const ele = this.wrap(selector);
+    if (!ele) {
+      return null;
+    }
+    return new this(ele, options);
+  }
+  static getInstance(selector) {
+    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    const ele = this.wrap(selector);
+    // @ts-ignore
+    return ele.__spectrum = ele.__spectrum || this.createIfExists(ele, options);
+  }
+  static hasInstance(selector) {
+    const ele = this.wrap(selector);
+    // @ts-ignore
+    return ele.__spectrum !== undefined;
+  }
+  static createMultiple(selector) {
+    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    const instances = [];
+    this.wrapList(selector).forEach(ele => {
+      instances.push(this.create(ele, options));
+    });
+    return instances;
+  }
+  static getInstanceMultiple(selector) {
+    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    const instances = [];
+    this.wrapList(selector).forEach(ele => {
+      instances.push(this.getInstance(ele, options));
+    });
+    return instances;
+  }
+  static wrap(selector) {
+    if (typeof selector === 'string') {
+      return document.querySelector(selector);
+    } else if (selector.jquery) {
+      return selector[0];
+    } else {
+      return selector;
+    }
+  }
+  static wrapList(selector) {
+    if (typeof selector === 'string') {
+      return Array.from(document.querySelectorAll(selector));
+    } else if (selector.jquery) {
+      return selector.toArray();
+    } else {
+      return Array.from(selector);
+    }
+  }
+  static locale(locale, localization) {
+    this.localization[locale] = localization;
+    return this;
+  }
+  constructor(ele) {
+    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    this.eventListeners = {};
+    this.spectrum = index(ele, options);
     this.ele = ele;
     this.options = options;
   }
-  Spectrum.create = function (selector, options) {
-    if (options === void 0) {
-      options = {};
-    }
-    return new this(this.wrap(selector), options);
-  };
-  Spectrum.getInstance = function (selector, options) {
-    if (options === void 0) {
-      options = {};
-    }
-    var ele = this.wrap(selector);
-    // @ts-ignore
-    return ele.__spectrum = ele.__spectrum || this.create(ele, options);
-  };
-  Spectrum.createMultiple = function (selector, options) {
-    var _this = this;
-    if (options === void 0) {
-      options = {};
-    }
-    var instances = [];
-    this.wrapList(selector).forEach(function (ele) {
-      instances.push(_this.create(ele, options));
-    });
-    return instances;
-  };
-  Spectrum.getInstanceMultiple = function (selector, options) {
-    var _this = this;
-    if (options === void 0) {
-      options = {};
-    }
-    var instances = [];
-    this.wrapList(selector).forEach(function (ele) {
-      instances.push(_this.getInstance(ele, options));
-    });
-    return instances;
-  };
-  Spectrum.wrap = function (selector) {
-    if (typeof selector === 'string') {
-      return document.querySelector(selector);
-    } else {
-      return selector;
-    }
-  };
-  Spectrum.wrapList = function (selector) {
-    if (typeof selector === 'string') {
-      return document.querySelectorAll(selector);
-    } else {
-      return selector;
-    }
-  };
-  Object.defineProperty(Spectrum.prototype, "id", {
-    get: function () {
-      return this.spectrum.id;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(Spectrum.prototype, "container", {
-    get: function () {
-      return this.spectrum.constructor;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Spectrum.prototype.show = function () {
+  get id() {
+    return this.spectrum.id;
+  }
+  get container() {
+    return this.spectrum.constructor;
+  }
+  show() {
     this.spectrum.show();
     return this;
-  };
-  Spectrum.prototype.hide = function () {
+  }
+  hide() {
     this.spectrum.hide();
     return this;
-  };
-  Spectrum.prototype.toggle = function () {
+  }
+  toggle() {
     this.spectrum.toggle();
     return this;
-  };
-  Spectrum.prototype.reflow = function () {
+  }
+  reflow() {
     this.spectrum.reflow();
     return this;
-  };
-  Spectrum.prototype.option = function (optionName, optionValue) {
-    if (optionName === void 0) {
-      optionName = undefined;
-    }
-    if (optionValue === void 0) {
-      optionValue = undefined;
-    }
+  }
+  option() {
+    let optionName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
+    let optionValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
     return this.spectrum.option(optionName, optionValue);
-  };
-  Spectrum.prototype.enable = function () {
+  }
+  enable() {
     this.spectrum.enable();
     return this;
-  };
-  Spectrum.prototype.disable = function () {
+  }
+  disable() {
     this.spectrum.disable();
     return this;
-  };
-  Spectrum.prototype.offset = function (coord) {
+  }
+  offset(coord) {
     this.spectrum.setOffset(coord);
     return this;
-  };
-  Spectrum.prototype.set = function (color, ignoreFormatChange) {
-    if (ignoreFormatChange === void 0) {
-      ignoreFormatChange = false;
-    }
+  }
+  set(color) {
+    let ignoreFormatChange = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
     this.spectrum.set(color, ignoreFormatChange);
     return this;
-  };
-  Spectrum.prototype.get = function () {
+  }
+  get() {
     return this.spectrum.get();
-  };
-  Spectrum.prototype.destroy = function () {
-    this.spectrum.destroy();
+  }
+  destroy() {
+    this.destroyInnerObject();
     // @ts-ignore
     delete this.ele.__spectrum;
     return this;
-  };
-  Spectrum.prototype.rebuild = function () {
-    this.spectrum.destroy();
-    this.spectrum = spectrum(this.ele, this.options);
+  }
+  rebuild(options) {
+    this.destroyInnerObject();
+    if (options) {
+      this.options = Object.assign({}, this.options, options);
+    }
+    this.spectrum = index(this.ele, this.options);
     return this;
+  }
+  destroyInnerObject() {
+    this.spectrum.destroy();
+    this.off();
+  }
+  listeners(eventName) {
+    return this.eventListeners[eventName] || [];
+  }
+  on(eventName, listener) {
+    let options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
+    this.ele.addEventListener(eventName, listener, options);
+    this.eventListeners[eventName] = this.eventListeners[eventName] || [];
+    this.eventListeners[eventName].push(listener);
+    return () => {
+      this.off(eventName, listener);
+    };
+  }
+  once(eventName, listener) {
+    let options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
+    const cancel = this.on(eventName, e => {
+      listener(e);
+      cancel();
+    }, options);
+    return cancel;
+  }
+  off() {
+    let eventName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
+    let listener = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+    if (eventName && !this.eventListeners[eventName]) {
+      return;
+    }
+    if (!eventName) {
+      this.eventListeners = {};
+      return;
+    }
+    if (listener) {
+      this.eventListeners[eventName] = this.eventListeners[eventName].filter(l => l === listener);
+      this.ele.removeEventListener(eventName, listener);
+    } else {
+      for (const listener of this.eventListeners[eventName]) {
+        this.ele.removeEventListener(eventName, listener);
+      }
+      this.eventListeners[eventName] = [];
+    }
+  }
+}
+Spectrum.defaultOptions = defaultOpts;
+Spectrum.draggable = draggable;
+Spectrum.localization = {};
+Spectrum.palette = [];
+// @ts-ignore
+const $ = window.$;
+if ($) {
+  // @ts-ignore
+  $.fn.spectrum = function () {
+    let action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
+    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+    if (typeof action === "string") {
+      let returnValue = this;
+      this.each(function () {
+        const spect = Spectrum.getInstance(this);
+        if (spect) {
+          const method = spect[action];
+          if (!method) {
+            throw new Error("Spectrum: no such method: '" + action + "'");
+          }
+          if (action === "get") {
+            returnValue = spect.get();
+          } else if (action === "container") {
+            returnValue = spect.container;
+          } else if (action === "option") {
+            returnValue = spect.option.apply(spect, args);
+          } else if (action === "destroy") {
+            spect.destroy();
+          } else {
+            spect[action](...args);
+          }
+        }
+      });
+      return returnValue;
+    }
+    // Initializing a new instance of spectrum
+    return this.each(function () {
+      const options = $.extend({}, $(this).data(), action);
+      // Infer default type from input params and deprecated options
+      if (!$(this).is('input')) {
+        options.type = 'color';
+      } else if (options.type == "flat") {
+        options.type = 'flat';
+      } else if ($(this).attr('type') == 'color') {
+        options.type = 'color';
+      } else {
+        options.type = options.type || 'component';
+      }
+      if (Spectrum.hasInstance(this)) {
+        const sp = Spectrum.getInstance(this);
+        sp.options = options;
+        sp.rebuild();
+      } else {
+        Spectrum.getInstance(this, options);
+      }
+    });
   };
-  Spectrum.defaultOptions = defaultOpts;
-  Spectrum.draggable = draggable;
-  return Spectrum;
-}();
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Spectrum);
+  $.fn.spectrum.load = true;
+  $.fn.spectrum.loadOpts = {};
+  $.fn.spectrum.draggable = draggable;
+  $.fn.spectrum.defaults = defaultOpts;
+  $.fn.spectrum.localization = Spectrum.localization;
+  $.fn.spectrum.palette = [];
+  $.fn.spectrum.processNativeColorInputs = function () {
+    const colorInputs = $("input[type=color]");
+    if (colorInputs.length) {
+      colorInputs.spectrum({
+        preferredFormat: "hex6"
+      });
+    }
+  };
+}
 })();
 
 __webpack_exports__ = __webpack_exports__["default"];

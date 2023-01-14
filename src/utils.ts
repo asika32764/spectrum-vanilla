@@ -5,8 +5,8 @@
  * @license    __LICENSE__
  */
 
-export function html(html: string) {
-  const div = document.createElement('div');
+export function html(html: string, doc = document) {
+  const div = doc.createElement('div');
   div.innerHTML = html;
   return div.children[0];
 }
@@ -50,11 +50,13 @@ export function removeClass(ele: HTMLElement, className: string) {
   return ele;
 }
 
-export function toggleClass(ele: HTMLElement,
-                            className: string,
-                            state: boolean | undefined = undefined) {
+export function toggleClass(
+  ele: HTMLElement,
+  className: string,
+  state: boolean | undefined = undefined
+) {
   if (state != undefined) {
-    ele.classList.toggle(className);
+    ele.classList.toggle(className, state);
   } else if (state === true) {
     addClass(ele, className);
   } else {
@@ -97,13 +99,13 @@ export type OffsetCSSOptions = { top?: number, bottom?: number, left?: number, r
 
 export function setElementOffset(
   elem: HTMLElement,
-  options: OffsetCSSOptions
+  options: OffsetCSSOptions,
 ) {
   let curPosition;
   let curTop;
   let curLeft;
   let calculatePosition;
-  let position = elem.style.position
+  let position = elem.style.position;
   let curElem = elem;
   let props: OffsetCSSOptions = {};
 
@@ -113,7 +115,7 @@ export function setElementOffset(
   }
 
   let curOffset = getElementOffset(curElem);
-  let curCSSTop = elem.style.top
+  let curCSSTop = elem.style.top;
   let curCSSLeft = elem.style.left;
   calculatePosition = (position === "absolute" || position === "fixed") &&
     (curCSSTop + curCSSLeft).indexOf("auto") > -1;
@@ -140,12 +142,12 @@ export function setElementOffset(
   if (options.left != null) {
     props.left = (options.left - curOffset.left) + curLeft;
   }
-
+  
   if ("using" in options) {
     options.using.call(elem, props);
   } else {
     for (const k in props) {
-      curElem.style[k] = props[k];
+      curElem.style[k] = props[k] + 'px';
     }
   }
 }
@@ -155,15 +157,15 @@ export function getElementOffset(el: HTMLElement) {
   const docElem = document.documentElement;
   return {
     top: box.top + window.pageYOffset - docElem.clientTop,
-    left: box.left + window.pageXOffset - docElem.clientLeft
+    left: box.left + window.pageXOffset - docElem.clientLeft,
   };
 }
 
 export function getElementPosition(el: HTMLElement) {
-  const {top, left} = el.getBoundingClientRect();
-  const {marginTop, marginLeft} = getComputedStyle(el);
+  const { top, left } = el.getBoundingClientRect();
+  const { marginTop, marginLeft } = getComputedStyle(el);
   return {
     top: top - parseInt(marginTop, 10),
-    left: left - parseInt(marginLeft, 10)
+    left: left - parseInt(marginLeft, 10),
   };
 }

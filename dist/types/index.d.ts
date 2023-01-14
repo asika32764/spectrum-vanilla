@@ -1,6 +1,8 @@
-import './spectrum.css';
+/// <reference types="jquery" />
+/// <reference types="jquery" />
 import { ColorInput } from 'tinycolor2';
-import { Options } from './types';
+import './spectrum.scss';
+import { Options, SpLang, SpListener } from './types';
 import { OffsetCSSOptions } from './utils';
 /**
  * Lightweight drag helper.  Handles containment within the element, so that
@@ -11,14 +13,24 @@ export default class Spectrum {
     private spectrum;
     ele: HTMLInputElement;
     options: Partial<Options>;
+    eventListeners: {
+        [event: string]: EventListener[];
+    };
     static defaultOptions: Partial<Options>;
     static draggable: typeof draggable;
-    static create(selector: string | HTMLInputElement, options?: Partial<Options>): Spectrum;
-    static getInstance(selector: string | HTMLInputElement, options?: Partial<Options>): any;
-    static createMultiple(selector: string | NodeListOf<HTMLInputElement>, options?: Partial<Options>): Spectrum[];
-    static getInstanceMultiple(selector: string | NodeListOf<HTMLInputElement>, options?: Partial<Options>): Spectrum[];
+    static localization: {
+        [locale: string]: SpLang;
+    };
+    static palette: string[][];
+    static create(selector: string | HTMLElement, options?: Partial<Options>): Spectrum;
+    static createIfExists(selector: string | HTMLElement, options?: Partial<Options>): Spectrum | null;
+    static getInstance(selector: string | HTMLElement, options?: Partial<Options>): Spectrum;
+    static hasInstance(selector: string | HTMLElement): boolean;
+    static createMultiple(selector: string | NodeListOf<HTMLElement>, options?: Partial<Options>): Spectrum[];
+    static getInstanceMultiple(selector: string | JQuery | NodeListOf<HTMLElement>, options?: Partial<Options>): Spectrum[];
     private static wrap;
     private static wrapList;
+    static locale(locale: string, localization: SpLang): typeof Spectrum;
     constructor(ele: HTMLInputElement, options?: Partial<Options>);
     get id(): number;
     get container(): HTMLElement;
@@ -33,6 +45,11 @@ export default class Spectrum {
     set(color: ColorInput, ignoreFormatChange?: boolean): this;
     get(): ColorInput;
     destroy(): this;
-    rebuild(): this;
+    rebuild(options?: Partial<Options>): this;
+    private destroyInnerObject;
+    listeners(eventName: string): EventListener[];
+    on(eventName: string, listener: SpListener, options?: AddEventListenerOptions | undefined): Function;
+    once(eventName: string, listener: SpListener, options?: AddEventListenerOptions | undefined): Function;
+    off(eventName?: string, listener?: EventListener | SpListener | undefined): void;
 }
 export {};

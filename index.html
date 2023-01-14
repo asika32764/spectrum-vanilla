@@ -1,34 +1,36 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Spectrum - The No Hassle jQuery Colorpicker</title>
+    <title>Spectrum Vanilla - The No Hassle Colorpicker with Vanilla JS</title>
 
-    <meta name="description" content="Spectrum is a JavaScript colorpicker plugin using the jQuery framework.  It is highly customizable, but can also be used as a simple input type=color polyfill">
-    <meta name="author" content="Brian Grinstead and Spectrum contributors">
+    <meta name="description" content="Spectrum is a JavaScript colorpicker plugin using vanilla JS.  It is a forked version from popular Spectrum2 colorpicker.">
+    <meta name="author" content="Simon Asika and Spectrum contributors">
 
     <link rel="stylesheet" type="text/css" href="dist/spectrum.css">
     <link rel="stylesheet" type="text/css" href="docs/docs.css">
     <link rel="stylesheet" type="text/css" href="docs/highlight/styles/default.css">
     <link rel="stylesheet" type="text/css" href="docs/highlight/styles/monokai-sublime.css">
-    <script type="text/javascript" src="docs/jquery-1.9.1.js"></script>
-    <script type="text/javascript" src="dist/spectrum.js"></script>
+    <script type="text/javascript" src="docs/jquery-3.6.3.js"></script>
     <script type='text/javascript' src='docs/toc.js'></script>
-    <script type='text/javascript' src='docs/docs.js'></script>
+    <script type='module' src='docs/docs.js'></script>
     <script type='text/javascript' src='docs/highlight/highlight.pack.js'></script>
 </head>
 <body>
-<div id='toc'></div>
+<div id="toc"></div>
 <div class="main-container">
-<div id='header'>
-    <h1><a href='http://seballot.github.com/spectrum'>Spectrum</a></h1>
-    <h2 class="subtitle"><em>The No Hassle jQuery Colorpicker</em></h2>
-    <div id='links'>
-        View the <a href='http://github.com/seballot/spectrum'>Source code</a>.
+<div id="header">
+    <h1><a href='http://github.com/asika32764/spectrum-vanilla'>Spectrum Vanilla</a></h1>
+    <h2 class="subtitle"><em>The No Hassle Colorpicker with Vanilla JS</em></h2>
+    <p>
+      Based on popular <a href="http://seballot.github.com/spectrum">Spectrum2</a> package. This version rewrote with TypeScript and drop IE support.
+    </p>
+    <div id="links">
+        See <a href='http://github.com/asika32764/spectrum-vanilla'>GitHub</a>.
     </div>
 </div>
 
-<div id='docs'>
+<div id="docs">
     <div id='docs-content'>
         <h2>Configurator</h2>
         <div class="configurator-container">
@@ -42,54 +44,131 @@
 
             <div class="config-section palette-options">
                 <h5>Palette</h5>
-                <label><input type="checkbox" data-rule='showPalette'><span>Show Palette</span></label>
-                <label><input type="checkbox" data-rule='showPaletteOnly'><span>Show Palette Only</span></label>
-                <label><input type="checkbox" data-rule='togglePaletteOnly'><span>Toggle Picker Button</span></label>
-                <label><input type="checkbox" data-rule='hideAfterPaletteSelect'><span>Hide After Palette Select</span></label>
+                <label><input type="checkbox" data-rule="showPalette"><span>Show Palette</span></label>
+                <label><input type="checkbox" data-rule="showPaletteOnly"><span>Show Palette Only</span></label>
+                <label><input type="checkbox" data-rule="togglePaletteOnly"><span>Toggle Picker Button</span></label>
+                <label><input type="checkbox" data-rule="hideAfterPaletteSelect"><span>Hide After Palette Select</span></label>
             </div>
 
             <div class="config-section picker-options">
                 <h5>Picker</h5>
-                <label><input type="checkbox" data-rule='showInput'><span>Show Input</span></label>
-                <label><input type="checkbox" data-rule='showInitial'><span>Show Initial Color</span></label>
-                <label><input type="checkbox" data-rule='showAlpha'><span>Transparency</span></label>
-                <label><input type="checkbox" data-rule='showButtons'><span>Show Cancel/Submit Buttons</span></label>
-                <label><input type="checkbox" data-rule='allowEmpty'><span>Clear Button</span></label>
+                <label><input type="checkbox" data-rule="showInput"><span>Show Input</span></label>
+                <label><input type="checkbox" data-rule="showInitial"><span>Show Initial Color</span></label>
+                <label><input type="checkbox" data-rule="showAlpha"><span>Transparency</span></label>
+                <label><input type="checkbox" data-rule="showButtons"><span>Show Cancel/Submit Buttons</span></label>
+                <label><input type="checkbox" data-rule="allowEmpty"><span>Clear Button</span></label>
             </div>
         </div>
 
         <div class="configurator-renderer">
-            <input id="color-picker" value='#276cb8' />
-            <pre>&lt;input id="color-picker" value='#276cb8' /&gt;</pre>
+            <input id="color-picker" value="#276cb8" />
+            <pre>&lt;input id="color-picker" value="#276cb8" /&gt;</pre>
             <pre id="sp-options">$('#color-picker').spectrum();</pre>
         </div>
 
 
-    <h2>Usage</h2>
+    <h2>Installation</h2>
     <h3>CDN</h3>
+
+      <p>Includes</p>
 <pre>
-&lt;script src="https://cdn.jsdelivr.net/npm/spectrum-colorpicker2/dist/spectrum.min.js"></script>
-&lt;link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/spectrum-colorpicker2/dist/spectrum.min.css">
+&lt;script src="https://unpkg.com/spectrum-vanilla/dist/spectrum.min.js"></script>
+&lt;link rel="stylesheet" type="text/css" href="https://unpkg.com/spectrum-vanilla/dist/spectrum.min.css">
+</pre>
+
+      <p>ES Module</p>
+<pre>
+&lt;script type="module">
+import Spectrum from 'https://unpkg.com/spectrum-vanilla/dist/spectrum.es.min.js';
+&lt;/script>
 </pre>
 
     <h3>npm</h3>
-    <pre>npm install spectrum-colorpicker2</pre>
+    <pre>npm install spectrum-vanilla</pre>
 
     <h3>Download files</h3>
-    <a href='https://github.com/seballot/spectrum/releases/latest' class="btn btn-primary">Download Zip</a>
+    <a href='https://github.com/asika32764/spectrum-vanilla/releases/latest' class="btn btn-primary">Download Zip</a>
 <pre>
 &lt;script src="spectrum.min.js"></script>
 &lt;link rel="stylesheet" type="text/css" href="spectrum.min.css">
 </pre>
 
 
+      <h2>Usage</h2>
+      <h3>Create Instance</h3>
+
+      <p>
+        Create a new instance by selector, not cache it, you must store this instance yourself
+      </p>
+
+<pre>
+// If this selector not found, will throw Error.
+const sp = Spectrum.create('#picker', [options]);
+
+// Just call methods on this instance.
+sp.show();
+sp.hide();
+
+// If this selector not found, will return NULL.
+const sp = Spectrum.createIfExists('#picker', [options]);
+
+// Create from element
+const element = document.querySelector('#picker');
+const sp = Spectrum.create(element, [options]);
+
+// Create from jQuery instance
+const element = $('#picker');
+const sp = Spectrum.create(element, [options]);
+</pre>
+
+      <p>
+        Create multiple new instances
+      </p>
+
+<pre>
+const sps = Spectrum.createMultiple('.picker', [options]); // Array&lt;Spectrum&gt;
+
+// Create from elements
+const elements = document.querySelectorAll('.picker');
+const sps = Spectrum.createMultiple(elements, [options]);
+
+// Create from jQuery instance
+const elements = $('.picker');
+const sps = Spectrum.createMultiple(elements, [options]);
+</pre>
+
+      <h3>Singleton</h3>
+
+      <p>You can get same instance if you use <code>getInstance()</code> method.</p>
+
+<pre>
+const sp = Spectrum.getInstance('#picker', [options]);
+
+// Always same instance
+sp === Spectrum.getInstance('#picker');
+
+// Get multiple instances
+const sps = Spectrum.getInstanceMultiple('.picker', [options]);
+</pre>
+
+      <h3>jQuery</h3>
+
+      <p>jQuery plugin still available</p>
+
+<pre>
+const sp = $('#picker').spectrum();
+
+$('#picker').spectrum('show');
+
+$('#picker').spectrum('hide');
+</pre>
 
 
     <h2 id="options">All Options</h2>
 <pre>
-$("#picker").spectrum({
+Spectrum.getInstance('#picker', {
     color: <strong>tinycolor</strong>,
-    type: sting, // text, component, color, flat
+    type: sting, // text, component, color, flat, Default is "component"
     showInput: bool,
     showInitial: bool,
     allowEmpty: bool,
@@ -108,7 +187,7 @@ $("#picker").spectrum({
     palette: [[string]],
     selectionPalette: [string],
     // specify locale
-    locale: string,
+    locale: string|object,
     // or directly change the translations
     cancelText: string,
     chooseText: string,
@@ -119,12 +198,12 @@ $("#picker").spectrum({
 });
 </pre>
         <div class="alert alert-info">
-            Tip: options can be specified in an options object in the <code>spectrum</code> initializer, like <code>$(element).spectrum({showAlpha: true })</code> or on the element's markup, like <code>&lt;input data-show-alpha="true" /&gt;</code>.
+            Tip: options can be specified in an options object in the <code>spectrum</code> initializer, like <code>Spectrum.getInstance(element, {showAlpha: true })</code> or on the element's markup, like <code>&lt;input data-show-alpha="true" /&gt;</code>.
         </div>
 
         <h3 id="options-color">Color</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 The initial color will be set with the <code>color</code> option.
                 If you don't pass in a color, Spectrum will use the <code>value</code> attribute on the input.
@@ -136,103 +215,103 @@ $("#picker").spectrum({
             </div>
 
             <pre>
-&lt;input type='text' class='basic' value='red' /&gt;
-&lt;input type='text' class='basic' value='#0f0' /&gt;
-&lt;input type='text' class='basic' value='blue' /&gt;
+&lt;input type="text" class="basic" value="red" /&gt;
+&lt;input type="text" class="basic" value="#0f0" /&gt;
+&lt;input type="text" class="basic" value="blue" /&gt;
 &lt;br /&gt;
-&lt;input type='text' class='override' /&gt;
+&lt;input type="text" class="override" /&gt;
 &lt;br /&gt;
-&lt;input type='text' class='startEmpty' value='' /&gt;
+&lt;input type="text" class="startEmpty" value="" /&gt;
             </pre>
 
             <pre>
 &lt;script&gt;
-$(".basic").spectrum();
-$(".override").spectrum({
+Spectrum.getInstance('.basic');
+Spectrum.getInstance('.override', {
     color: "yellow"
 });
-(".startEmpty").spectrum({
+('.startEmpty').spectrum({
     allowEmpty: true
 });
 &lt;/script&gt;
             </pre>
-            <div class='example'>
-                <input type='text' class='basic' value='red' />
-                <input type='text' class='basic' value='green' />
-                <input type='text' class='basic' value='blue' />
+            <div class="example">
+                <input type="text" class="basic" value="red" />
+                <input type="text" class="basic" value="green" />
+                <input type="text" class="basic" value="blue" />
                 <br />
-                <input type='text' class='override' />
+                <input type="text" class="override" />
                 <br/>
-                <input type='text' class='startEmpty' value='' />
+                <input type="text" class="startEmpty" value="" />
             </div>
         </div>
 
         <h3 id="options-showInput">Show Input</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>You can add an input to allow free form typing.  The color parsing is very permissive in the allowed strings.  See <a href='https://github.com/bgrins/TinyColor'>TinyColor</a> for more details.
             </div>
             <pre>
-$("#showInput").spectrum({
+Spectrum.getInstance('#showInput', {
     showInput: true
 });
-$("#showInputWithClear").spectrum({
+Spectrum.getInstance('#showInputWithClear', {
     showInput: true,
     allowEmpty:true
 });
             </pre>
-            <div class='example'>
-                <input type='text' name='showInput' id='showInput' />
+            <div class="example">
+                <input type="text" name="showInput" id="showInput" />
                  <br/>
-                <input type='text' name='showInputWithClear' id='showInputWithClear' value='' />
+                <input type="text" name="showInputWithClear" id="showInputWithClear" value="" />
             </div>
         </div>
 
         <h3 id="options-showAlpha">Show Alpha</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>You can allow alpha transparency selection.  Check out these examples: </p>
             </div>
             <pre>
-$("#showAlpha").spectrum({
+Spectrum.getInstance('#showAlpha', {
     showAlpha: true
 });
             </pre>
-            <div class='example'>
-                <input type='text' name='showAlpha' id='showAlpha' />
+            <div class="example">
+                <input type="text" name="showAlpha" id="showAlpha" />
             </div>
-            <div class='example'>
-                <input type='text' name='showAlphaWithInput' id='showAlphaWithInput' />
+            <div class="example">
+                <input type="text" name="showAlphaWithInput" id="showAlphaWithInput" />
             </div>
         </div>
 
         <h3 id="options-disabled">Disabled</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
             <p>Spectrum can be automatically disabled if you pass in the <code>disabled</code> flag.  Additionally, if the input that you initialize spectrum on is disabled, this will be the default value.  Note: you <strong>cannot</strong> enable spectrum if the input is disabled (see below).</p>
             </div>
             <pre>
-$("#disabled").spectrum({
+Spectrum.getInstance('#disabled', {
     disabled: true
 });
 $("input:disabled").spectrum({
 
 });
             </pre>
-            <div class='example'>
-                    <input type='text' name='disabled' id='disabled' value='lightblue' />
-                    <input type='text' disabled value='lightblue' />
-                    <button id='toggle-disabled' class='btn'>Toggle Disabled</button>
+            <div class="example">
+                    <input type="text" name="disabled" id="disabled" value="lightblue" />
+                    <input type="text" disabled value="lightblue" />
+                    <button id='toggle-disabled' class="btn">Toggle Disabled</button>
             </div>
         </div>
 
         <h3 id="options-showPalette">Show Palette</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
             <p>Spectrum can show a palette below the colorpicker to make it convenient for users to choose from frequently or recently used colors.  When the colorpicker is closed, the current color will be added to the palette if it isn't there already.  Check it out here: </p>
             </div>
             <pre>
-$("#showPalette").spectrum({
+Spectrum.getInstance('#showPalette', {
     showPalette: true,
     palette: [
         ['black', 'white', 'blanchedalmond'],
@@ -240,8 +319,8 @@ $("#showPalette").spectrum({
     ]
 });
             </pre>
-            <div class='example'>
-                    <input type='text' name='showPalette' id='showPalette' value='lightblue' />
+            <div class="example">
+                    <input type="text" name="showPalette" id="showPalette" value="lightblue" />
                     <em data-label-for="showPalette" class='em-label'></em>
 
             </div>
@@ -249,12 +328,12 @@ $("#showPalette").spectrum({
 
         <h3 id="options-showPaletteOnly">Show Palette Only</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
             <p>If you'd like, spectrum can show the palettes you specify, and nothing else.</p>
             </div>
 
             <pre>
-$("#showPaletteOnly").spectrum({
+Spectrum.getInstance('#showPaletteOnly', {
     showPaletteOnly: true,
     showPalette:true,
     color: 'blanchedalmond',
@@ -265,22 +344,22 @@ $("#showPaletteOnly").spectrum({
     ]
 });
             </pre>
-            <div class='example'>
-                <input type='text' name='showPaletteOnly' id='showPaletteOnly'  />
+            <div class="example">
+                <input type="text" name="showPaletteOnly" id="showPaletteOnly"  />
                 <em data-label-for="showPaletteOnly" class='em-label'></em>
             </div>
         </div>
 
         <h3 id="options-togglePaletteOnly">Toggle Palette Only</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
             <p>Spectrum can show a button to toggle the colorpicker next to the palette. This way, the user can choose from a limited number of colors in the palette, but still be able to pick a color that's not in the palette.<br />
                 The default value for <code>togglePaletteOnly</code> is FALSE. Set it to TRUE to enable the Toggle button.<br /><br />
                 You can also change the text on the Toggle Button with the options <code>togglePaletteMoreText</code> (default is "more") and <code>togglePaletteLessText</code> (default is "less").</p>
             </div>
 
             <pre>
-$("#togglePaletteOnly").spectrum({
+Spectrum.getInstance('#togglePaletteOnly', {
     showPaletteOnly: true,
     togglePaletteOnly: true,
     togglePaletteMoreText: 'more',
@@ -298,25 +377,25 @@ $("#togglePaletteOnly").spectrum({
     ]
 });
             </pre>
-            <div class='example'>
-                <input type='text' name='togglePaletteOnly' id='togglePaletteOnly'  />
+            <div class="example">
+                <input type="text" name="togglePaletteOnly" id="togglePaletteOnly"  />
             </div>
         </div>
 
         <h3 id="options-showSelectionPalette">Show Selection Palette</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>Spectrum can keep track of what has been selected by the user with the <code>showSelectionPalette</code> option.</p>
                 <p>If the <code>localStorageKey</code> option is defined, the selection will be saved in the browser's localStorage object</p>
             </div>
 
             <pre>
-$("#showSelectionPalette").spectrum({
+Spectrum.getInstance('#showSelectionPalette', {
     showPalette: true,
     showSelectionPalette: true, // true by default
     palette: [ ]
 });
-$("#showSelectionPaletteStorage").spectrum({
+Spectrum.getInstance('#showSelectionPaletteStorage', {
     showPalette: true,
     showSelectionPalette: true,
     palette: [ ],
@@ -324,24 +403,24 @@ $("#showSelectionPaletteStorage").spectrum({
 });
             </pre>
 
-            <div class='example'>
+            <div class="example">
                     <span class='label label-info'>This colorpicker will store what you pick:</span><br /><br />
-                    <input type='text' name='showSelectionPalette' id='showSelectionPalette' value='lightblue' /><br /><br />
+                    <input type="text" name="showSelectionPalette" id="showSelectionPalette" value="lightblue" /><br /><br />
                     <span class='label label-info'>Try switching between the two colorpickers or reloading your page, the chosen colors are always available:</span><br /><br />
-                    <input type='text' name='showSelectionPaletteStorage' id='showSelectionPaletteStorage' value='lightblue' />
-                    <input type='text' name='showSelectionPaletteStorage2' id='showSelectionPaletteStorage2' value='pink' />
+                    <input type="text" name="showSelectionPaletteStorage" id="showSelectionPaletteStorage" value="lightblue" />
+                    <input type="text" name="showSelectionPaletteStorage2" id="showSelectionPaletteStorage2" value="pink" />
             </div>
         </div>
 
         <h3 id="options-selectionPalette">Selection Palette</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>The default values inside of the selection palette.  Make sure that <a href="#options-showSelectionPalette">showSelectionPalette</a> and <a href="#options-showPalette">showPalette</a> are both enabled.</p>
                 <p>If a <code>localStorageKey</code> is defined, then this value will be overwritten by it.</p>
             </div>
 
             <pre>
-$("#selectionPalette").spectrum({
+Spectrum.getInstance('#selectionPalette', {
     showPalette: true,
     palette: [ ],
     showSelectionPalette: true, // true by default
@@ -349,21 +428,21 @@ $("#selectionPalette").spectrum({
 });
             </pre>
 
-            <div class='example'>
+            <div class="example">
                     <span class='label label-info'>This colorpicker has default values in the selection palette:</span><br /><br />
-                    <input type='text' name='selectionPalette' id='selectionPalette' value='orange' />
+                    <input type="text" name="selectionPalette" id="selectionPalette" value="orange" />
             </div>
         </div>
 
         <h3 id="options-maxSelectionSize">Max Selection Size</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>This is how many elements are allowed in the <a href="#options-selectionPalette">selectionPallete</a> at once.</p>
                 <p>Elements will be removed from the palette in first in - first out order if this limit is reached.</p>
             </div>
 
             <pre>
-$("#maxSelectionSize").spectrum({
+Spectrum.getInstance('#maxSelectionSize', {
     showPalette: true,
     palette: [ ],
     showSelectionPalette: true, // true by default
@@ -372,20 +451,20 @@ $("#maxSelectionSize").spectrum({
 });
             </pre>
 
-            <div class='example'>
+            <div class="example">
                     <span class='label label-info'>This colorpicker starts removing selection palette colors older than 2:</span><br /><br />
-                    <input type='text' name='maxSelectionSize' id='maxSelectionSize' value='red' />
+                    <input type="text" name="maxSelectionSize" id="maxSelectionSize" value="red" />
             </div>
         </div>
 
         <h3 id="options-hideAfterPaletteSelect">Hide After Palette Select</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
             <p>You can have the colorpicker automatically hide after a palette color is selected.</p>
             </div>
 
             <pre>
-$("#hideAfterPaletteSelect").spectrum({
+Spectrum.getInstance('#hideAfterPaletteSelect', {
     showPaletteOnly: true,
     showPalette:true,
     hideAfterPaletteSelect:true,
@@ -397,38 +476,38 @@ $("#hideAfterPaletteSelect").spectrum({
     ]
 });
             </pre>
-            <div class='example'>
-                <input type='text' name='hideAfterPaletteSelect' id='hideAfterPaletteSelect'  />
+            <div class="example">
+                <input type="text" name="hideAfterPaletteSelect" id="hideAfterPaletteSelect"  />
                 <em data-label-for="hideAfterPaletteSelect" class='em-label'></em>
             </div>
         </div>
 
         <h3 id="options-clickoutFiresChange">Clickout Fires Change</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 When clicking outside of the colorpicker, you can force it to fire a <code>change</code> event rather than having it revert the change.  This is <code>true</code> by default.
                 </p>
             </div>
 
             <pre>
-$("#clickoutFiresChange").spectrum({
+Spectrum.getInstance('#clickoutFiresChange', {
     clickoutFiresChange: true
 });
-$("#clickoutDoesntChange").spectrum({
+Spectrum.getInstance('#clickoutDoesntChange', {
     clickoutFiresChange: false
 });
             </pre>
 
-            <div class='example'>
-                    <input type='text' name='clickoutFiresChange' id='clickoutFiresChange' value='goldenrod' />
-                    <input type='text' name='clickoutDoesntFireChange' id='clickoutDoesntFireChange' value='goldenrod' />
+            <div class="example">
+                    <input type="text" name="clickoutFiresChange" id="clickoutFiresChange" value="goldenrod" />
+                    <input type="text" name="clickoutDoesntFireChange" id="clickoutDoesntFireChange" value="goldenrod" />
             </div>
         </div>
 
         <h3 id="options-showInitial">Show Initial</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Spectrum can show the color that was initially set when opening.
                 This provides an easy way to click back to what was set when opened.
@@ -436,69 +515,94 @@ $("#clickoutDoesntChange").spectrum({
             </div>
 
             <pre>
-$("#showInitial").spectrum({
+Spectrum.getInstance('#showInitial', {
     showInitial: true
 });
             </pre>
 
-            <div class='example'>
-                    <input type='text' name='showInitial' id='showInitial' value='goldenrod' />
+            <div class="example">
+                    <input type="text" name="showInitial" id="showInitial" value="goldenrod" />
             </div>
         </div>
 
         <h3 id="options-showInputAndInitial">Show Input and Initial</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>If you specify both the <code>showInput</code> and <code>showInitial</code> options, the CSS keeps things in order by wrapping the buttons to the bottom row, and shrinking the input.   <em>Note: this is all customizable via CSS.</em></p>
             </div>
             <pre>
-$("#showInputAndInitial").spectrum({
+Spectrum.getInstance('#showInputAndInitial', {
     showInitial: true,
     showInput: true
 });
             </pre>
 
-            <div class='example'>
-                    <input type='text' name='showInputAndInitial' id='showInputAndInitial' value='goldenrod' />
+            <div class="example">
+                    <input type="text" name="showInputAndInitial" id="showInputAndInitial" value="goldenrod" />
             </div>
         </div>
          <h3>Show Input, Initial, and Clear</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>If you specify both the <code>showInput</code>, <code>showInitial</code>, and <code>allowEmpty</code> options, the CSS keeps things in order by wrapping the buttons to the bottom row, and shrinking the input.   <em>Note: this is all customizable via CSS.</em></p>
             </div>
             <pre>
-$("#showInputInitialClear").spectrum({
+Spectrum.getInstance('#showInputInitialClear', {
     allowEmpty:true,
     showInitial: true,
     showInput: true
 });
             </pre>
 
-            <div class='example'>
-                    <input type='text' name='showInputInitialClear' id='showInputInitialClear' value='' />
+            <div class="example">
+                    <input type="text" name="showInputInitialClear" id="showInputInitialClear" value="" />
             </div>
         </div>
-        <h3 id="options-buttonText">Internationalisation</h3>
+        <h3 id="options-buttonText">Locale</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>Specify `locale` so choose a language. If not specified, spectrum will try to use the navigator language. Alternatly, you can directly specify translated text with <code>cancelText</code>, <code>chooseText</code>, <code>togglePaletteMoreText</code>, <code>togglePaletteLessText</code>, <code>clearText</code> and <code>noColorSelectedText</code> properties.</p>
             </div>
             <pre>
-$("#buttonText").spectrum({
+&lt;script src="dist/spectrum.min.js"></script>
+&lt;script src="dist/i18n/fr.js"></script>
+</pre>
+            <pre>
+Spectrum.getInstance('#buttonText', {
     locale: "fr"
-    chooseText: "OK!" // use 'OK' instead of 'Valider'
+    chooseText: "OK!" // Directly override lang text
 });
             </pre>
 
-            <div class='example'>
-                    <input type='text' name='buttonText' id='buttonText' value='orangered' />
-            </div>
+          <div class="example">
+            <input type="text" name="buttonText" id="buttonText" value="orangered" />
+          </div>
+
+          <p>To use locale in ES module, you must include from another <code>i18n-es</code> dir and register it manually.</p>
+
+          <pre>
+import Spectrum from './dist/spectrum.es.js';
+import zhtw from './dist/i18n-es/zh-tw.js';
+
+Spectrum.locale('zh-tw', zhtw);
+
+Spectrum.getInstance('#buttonText', { locale: "zh-tw" });
+          </pre>
+
+          <p>Or you may just send locale object to options.</p>
+
+          <pre>
+import Spectrum from './dist/spectrum.es.js';
+import zhtw from './dist/i18n-es/zh-tw.js';
+
+Spectrum.getInstance('#buttonText', { locale: zhtw });
+          </pre>
+
         </div>
 
         <h3 id="options-showButtons">Show Buttons</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 You can show or hide the buttons using the <code>showButtons</code> property.
                 If there are no buttons, the behavior will be to fire the `change` event (and update the original input) when the picker is closed.
@@ -506,26 +610,26 @@ $("#buttonText").spectrum({
             </div>
 
             <pre>
-$("#hideButtons").spectrum({
+Spectrum.getInstance('#hideButtons', {
     showButtons: false
 });
             </pre>
 
-            <div class='example'>
-                    <input type='text' name='hideButtons' id='hideButtons' value='orangered' />
+            <div class="example">
+                    <input type="text" name="hideButtons" id="hideButtons" value="orangered" />
             </div>
         </div>
 
         <h3 id="options-containerClassName">Container Class Name</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 You can add an additional class name to the just the container element using the <code>containerClassName</code> property.
                 </p>
             </div>
 
             <pre>
-$("#containerClassName").spectrum({
+Spectrum.getInstance('#containerClassName', {
     containerClassName: 'awesome'
 });
             </pre>
@@ -540,21 +644,21 @@ $("#containerClassName").spectrum({
 }
             </style>
 
-            <div class='example'>
-                    <input type='text' name='containerClassName' id='containerClassName' value='orangered' />
+            <div class="example">
+                    <input type="text" name="containerClassName" id="containerClassName" value="orangered" />
             </div>
         </div>
 
         <h3 id="options-replacerClassName">Replacer Class Name</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 You can add an additional class name to just the replacer element using the <code>replacerClassName</code> property.
                 </p>
             </div>
 
             <pre>
-$("#replacerClassName").spectrum({
+Spectrum.getInstance('#replacerClassName', {
     replacerClassName: 'awesome'
 });
             </pre>
@@ -569,74 +673,74 @@ $("#replacerClassName").spectrum({
 }
             </style>
 
-            <div class='example'>
-                    <input type='text' name='replacerClassName' id='replacerClassName' value='orangered' />
+            <div class="example">
+                    <input type="text" name="replacerClassName" id="replacerClassName" value="orangered" />
             </div>
         </div>
 
         <h3 id="options-preferredFormat">Preferred Format</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>You can set the format that is displayed in the text box.</p>
                 <p>This will also change the format that is displayed in the titles from the palette swatches.</p>
             </div>
 
             <pre>
-$("#preferredHex").spectrum({
+Spectrum.getInstance('#preferredHex', {
     preferredFormat: "hex",
     showInput: true,
     showPalette: true,
     palette: [["red", "rgba(0, 255, 0, .5)", "rgb(0, 0, 255)"]]
 });
-$("#preferredHex3").spectrum({
+Spectrum.getInstance('#preferredHex3', {
     preferredFormat: "hex3",
     showInput: true,
     showPalette: true,
     palette: [["red", "rgba(0, 255, 0, .5)", "rgb(0, 0, 255)"]]
 });
-$("#preferredHsl").spectrum({
+Spectrum.getInstance('#preferredHsl', {
     preferredFormat: "hsl",
     showInput: true,
     showPalette: true,
     palette: [["red", "rgba(0, 255, 0, .5)", "rgb(0, 0, 255)"]]
 });
-$("#preferredRgb").spectrum({
+Spectrum.getInstance('#preferredRgb', {
     preferredFormat: "rgb",
     showInput: true,
     showPalette: true,
     palette: [["red", "rgba(0, 255, 0, .5)", "rgb(0, 0, 255)"]]
 });
-$("#preferredName").spectrum({
+Spectrum.getInstance('#preferredName', {
     preferredFormat: "name",
     showInput: true,
     showPalette: true,
     palette: [["red", "rgba(0, 255, 0, .5)", "rgb(0, 0, 255)"]]
 });
-$("#preferredNone").spectrum({
+Spectrum.getInstance('#preferredNone', {
     showInput: true,
     showPalette: true,
     palette: [["red", "rgba(0, 255, 0, .5)", "rgb(0, 0, 255)"]]
 });
             </pre>
-            <div class='example'>
+            <div class="example">
                     <div class='alert alert-info'>Hex</div>
-                    <input type='text' name='preferredHex' id='preferredHex' value='orangered' />
+                    <input type="text" name="preferredHex" id="preferredHex" value="orangered" />
                     <div class='alert alert-info'>Hex (3 Characters If Possible)</div>
-                    <input type='text' name='preferredHex3' id='preferredHex3' value='orangered' />
+                    <input type="text" name="preferredHex3" id="preferredHex3" value="orangered" />
                     <div class='alert alert-info'>Hsl</div>
-                    <input type='text' name='preferredHsl' id='preferredHsl' value='orangered' />
+                    <input type="text" name="preferredHsl" id="preferredHsl" value="orangered" />
                     <div class='alert alert-info'>Rgb</div>
-                    <input type='text' name='preferredRgb' id='preferredRgb' value='orangered' />
+                    <input type="text" name="preferredRgb" id="preferredRgb" value="orangered" />
                     <div class='alert alert-info'>Name (Falls back to hex)</div>
-                    <input type='text' name='preferredName' id='preferredName' value='orangered' />
+                    <input type="text" name="preferredName" id="preferredName" value="orangered" />
                     <div class='alert alert-info'>None (Depends on input - try changing formats with the text box)</div>
-                    <input type='text' name='preferredNone' id='preferredNone' value='orangered' />
+                    <input type="text" name="preferredNone" id="preferredNone" value="orangered" />
             </div>
         </div>
 
         <h3 id="options-appendTo">appendTo</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>You can choose which element the colorpicker container is appended to (default is <code>"body"</code>). This can be any valid object taken into the jQuery <a href="https://api.jquery.com/appendTo/">appendTo</a> function.</p>
                 <p>Changing this can help resolve issues with opening the colorpicker in a modal dialog or fixed position container, for instance.</p>
             </div>
@@ -646,34 +750,40 @@ $("#preferredNone").spectrum({
 
 <pre>
 // Events can be bound in the intialization process as options:
-$("#picker").spectrum({
-    move: function(tinycolor) { },
-    show: function(tinycolor) { },
-    hide: function(tinycolor) { },
-    beforeShow: function(tinycolor) { },
+const sp = Spectrum.getInstance('#picker', {
+    move: function(e) {
+      const color = e.detail.color;
+    },
+    show: function(e) { },
+    hide: function(e) { },
+    beforeShow: function(e) { },
 });
 
 // Alternatively, they can be added as an event listener:
-$("#picker").on('move.spectrum', function(e, tinycolor) { });
-$("#picker").on('show.spectrum', function(e, tinycolor) { });
-$("#picker").on('hide.spectrum', function(e, tinycolor) { });
-$("#picker").on('beforeShow.spectrum', function(e, tinycolor) { });
+sp.on('move', function(e) { });
+sp.on('show', function(e) { });
+sp.on('hide', function(e) { });
+sp.on('beforeShow', function(e) { });
+
+// This events will also push to element
+const ele = document.querySelector('#picker');
+ele.addEventListener('change', (e) => { });
 </pre>
 
         <h3 id="events-change">change</h3>
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>Called as the original input changes.  Only happens when the input is closed or the 'Choose' button is clicked.</p>
             </div>
 
             <pre>
-change: function(color) {
-    color.toHexString(); // #ff0000
+change: function(e) {
+    e.detail.color.toHexString(); // #ff0000
 }
             </pre>
 
-            <div class='example'>
-                <input type='text' value='blanchedalmond' name='changeOnMoveNo' id='changeOnMoveNo' />
+            <div class="example">
+                <input type="text" value="blanchedalmond" name="changeOnMoveNo" id="changeOnMoveNo" />
                 <em data-label-for="changeOnMoveNo" class='em-label'></em>
             </div>
         </div>
@@ -681,18 +791,18 @@ change: function(color) {
         <h3 id="events-move">move</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>Called as the user moves around within the colorpicker</p>
             </div>
 
             <pre>
-move: function(color) {
-    color.toHexString(); // #ff0000
+move: function(e) {
+    e.detail.color.toHexString(); // #ff0000
 }
             </pre>
 
-            <div class='example'>
-                <input type='text' value='blanchedalmond' name='changeOnMove' id='changeOnMove' />
+            <div class="example">
+                <input type="text" value="blanchedalmond" name="changeOnMove" id="changeOnMove" />
                 <em data-label-for="changeOnMove" class='em-label'></em>
             </div>
         </div>
@@ -700,7 +810,7 @@ move: function(color) {
         <h3 id="events-hide">hide</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
 
                 <p>
                 Called after the colorpicker is hidden.
@@ -711,21 +821,21 @@ move: function(color) {
             </div>
 
             <pre>
-hide: function(color) {
-    color.toHexString(); // #ff0000
+hide: function(e) {
+    e.detail.color.toHexString(); // #ff0000
 }
             </pre>
 
-            <div class='example'>
-                <input type='text' value='blanchedalmond' name='eventhide' id='eventhide' />
-                <em id='eventhideLabel'  class='em-label'></em>
+            <div class="example">
+                <input type="text" value="blanchedalmond" name="eventhide" id="eventhide" />
+                <em id="eventhideLabel"  class='em-label'></em>
             </div>
         </div>
 
         <h3 id="events-show">show</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Called after the colorpicker is opened.
                 This is ignored on a flat colorpicker.
@@ -734,21 +844,21 @@ hide: function(color) {
             </div>
 
             <pre>
-show: function(color) {
-    color.toHexString(); // #ff0000
+show: function(e) {
+    e.detail.color.toHexString(); // #ff0000
 }
             </pre>
 
-            <div class='example'>
-                <input type='text' value='blanchedalmond' name='eventshow' id='eventshow' />
-                <em id='eventshowLabel'  class='em-label'></em>
+            <div class="example">
+                <input type="text" value="blanchedalmond" name="eventshow" id="eventshow" />
+                <em id="eventshowLabel"  class='em-label'></em>
             </div>
         </div>
 
         <h3 id="events-beforeShow">beforeShow</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 You can prevent the colorpicker from showing up if you return false in the beforeShow event.
                 This event is ignored on a flat colorpicker.
@@ -756,20 +866,20 @@ show: function(color) {
             </div>
 
             <pre>
-beforeShow: function(color) {
+beforeShow: function(e) {
     return false; // Will never show up
 }
             </pre>
 
-            <div class='example'>
-                <input type='text' value='blanchedalmond' name='beforeShow' id='beforeShow' />
+            <div class="example">
+                <input type="text" value="blanchedalmond" name="beforeShow" id="beforeShow" />
             </div>
         </div>
 
         <h3 id="events-dragstart">dragstart</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Called at the beginning of a drag event on either
                 hue slider, alpha slider, or main color picker areas
@@ -777,21 +887,21 @@ beforeShow: function(color) {
             </div>
 
             <pre>
-$(element).on("dragstart.spectrum", function(e, color) {
-    color.toHexString(); // #ff0000
+sp.on("dragstart", function(e) {
+    e.detail.color.toHexString(); // #ff0000
 });
             </pre>
 
-            <div class='example'>
-                <input type='text' value='blanchedalmond' name='eventdragstart' id='eventdragstart' />
-                <em id='eventdragstartLabel'  class='em-label'></em>
+            <div class="example">
+                <input type="text" value="blanchedalmond" name="eventdragstart" id="eventdragstart" />
+                <em id="eventdragstartLabel"  class='em-label'></em>
             </div>
         </div>
 
         <h3 id="events-dragstop">dragstop</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Called at the end of a drag event on either
                 hue slider, alpha slider, or main color picker areas
@@ -799,38 +909,39 @@ $(element).on("dragstart.spectrum", function(e, color) {
             </div>
 
             <pre>
-$(element).on("dragstop.spectrum", function(e, color) {
-    color.toHexString(); // #ff0000
+sp.on("dragstop", function(e) {
+    e.detail.color.toHexString(); // #ff0000
 });
             </pre>
 
-            <div class='example'>
-                <input type='text' value='blanchedalmond' name='eventdragstop' id='eventdragstop' />
-                <em id='eventdragstopLabel'  class='em-label'></em>
+            <div class="example">
+                <input type="text" value="blanchedalmond" name="eventdragstop" id="eventdragstop" />
+                <em id="eventdragstopLabel"  class='em-label'></em>
             </div>
         </div>
 
 
         <h2 id="methods">Methods</h2>
 <pre>
-$("#picker").spectrum("show");
-$("#picker").spectrum("hide");
-$("#picker").spectrum("toggle");
-$("#picker").spectrum("get");
-$("#picker").spectrum("set", colorString);
-$("#picker").spectrum("container");
-$("#picker").spectrum("reflow");
-$("#picker").spectrum("destroy");
-$("#picker").spectrum("enable");
-$("#picker").spectrum("disable");
-$("#picker").spectrum("option", optionName);
-$("#picker").spectrum("option", optionName, newOptionValue);
+sp.show();
+sp.hide();
+sp.toggle();
+sp.get();
+sp.set(color);
+sp.container;
+sp.reflow();
+sp.destroy();
+sp.rebuild();
+sp.enable();
+sp.disable();
+sp.option(optionName);
+sp.option(optionName, newOptionValue);
 </pre>
 
         <h3 id="methods-show">show</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Shows the colorpicker.
                 </p>
@@ -840,7 +951,7 @@ $("#picker").spectrum("option", optionName, newOptionValue);
         <h3 id="methods-hide">hide</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Hides the colorpicker.
                 </p>
@@ -850,7 +961,7 @@ $("#picker").spectrum("option", optionName, newOptionValue);
         <h3 id="methods-toggle">toggle</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Toggles the colorpicker.
                 </p>
@@ -860,14 +971,14 @@ $("#picker").spectrum("option", optionName, newOptionValue);
             </div>
 
             <pre>
-$("#btn-toggle").click(function() {
-    $("#toggle").spectrum("toggle");
+toggleButton.addEventListener('click', () => {
+    sp.toggle();
     return false;
 });
             </pre>
 
-            <div class='example'>
-                <input type='text' value='blanchedalmond' name='toggle' id='toggle' />
+            <div class="example">
+                <input type="text" value="blanchedalmond" name="toggle" id="toggle" />
                 <button id='btn-toggle'>Toggle</button>
             </div>
         </div>
@@ -875,7 +986,7 @@ $("#btn-toggle").click(function() {
         <h3 id="methods-get">get</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Gets the current value from the colorpicker.
                 </p>
@@ -885,7 +996,7 @@ $("#btn-toggle").click(function() {
         <h3 id="methods-set">set</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Setting the colorpicker programmatically will update the original input.
                 </p>
@@ -896,32 +1007,33 @@ $("#btn-toggle").click(function() {
             </div>
 
             <pre>
-&lt;input type='text' value='blanchedalmond' name='triggerSet' id='triggerSet' /&gt;
-&lt;input type='text' placeholder='Enter A Color' id='enterAColor' /&gt;
-&lt;button id='btnEnterAColor'&gt;Trigger Set&lt;/button&gt;
+&lt;input type="text" value="blanchedalmond" name="triggerSet" id="triggerSet" /&gt;
+&lt;input type="text" placeholder='Enter A Color' id="enterAColor" /&gt;
+&lt;button id="btnEnterAColor"&gt;Trigger Set&lt;/button&gt;
 
 &lt;script&gt;
-$("#triggerSet").spectrum();
+const sp = Spectrum.getInstance('#triggerSet');
 
 // Show the original input to demonstrate the value changing when calling `set`
-$("#triggerSet").show();
+sp.show();
 
-$("#btnEnterAColor").click(function() {
-    $("#triggerSet").spectrum("set", $("#enterAColor").val());
+const input = document.querySelector('#enterAColor');
+document.querySelector('#btnEnterAColor').addEventListener('click', () => {
+    sp.set(input.value);
 });
 &lt;/script&gt;
             </pre>
 
-            <div class='example'>
-                <input type='text' value='blanchedalmond' name='triggerSet' id='triggerSet' /><br /><br />
-                <input type='text' placeholder='Enter A Color' id='enterAColor' /><button id='btnEnterAColor'>Trigger Set</button>
+            <div class="example">
+                <input type="text" value="blanchedalmond" name="triggerSet" id="triggerSet" /><br /><br />
+                <input type="text" placeholder='Enter A Color' id="enterAColor" /><button id="btnEnterAColor">Trigger Set</button>
             </div>
         </div>
 
         <h3 id="methods-container">container</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Retrieves the container element of the colorpicker, in case you want to manaully position it or do other things.
                 </p>
@@ -931,7 +1043,7 @@ $("#btnEnterAColor").click(function() {
         <h3 id="methods-reflow">reflow</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Resets the positioning of the container element.  This could be used was hidden when initialized, or if the colorpicker is inside of a moving area.
                 </p>
@@ -941,7 +1053,7 @@ $("#btnEnterAColor").click(function() {
         <h3 id="methods-destroy">destroy</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Removes the colorpicker functionality and restores the element to its original state.
                 </p>
@@ -951,7 +1063,7 @@ $("#btnEnterAColor").click(function() {
         <h3 id="methods-enable">enable</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Allows selection of the colorpicker component.  If it is already enabled, this method does nothing.
                 </p>
@@ -964,7 +1076,7 @@ $("#btnEnterAColor").click(function() {
         <h3 id="methods-disable">disable</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Disables selection of the colorpicker component.  Adds the <code>sp-disabled</code> class onto the replacer element.  If it is already disabled, this method does nothing.
                 </p>
@@ -977,57 +1089,47 @@ $("#btnEnterAColor").click(function() {
         <h3 id="methods-option">option</h3>
 
         <div class='option-content'>
-            <div class='description'>
+            <div class="description">
                 <p>
                 Calling <code>option</code> with an option name will return the current value of that option.  So, for example:
                 </p>
                 <pre>
-$("input").spectrum({
+const sp = Spectrum.getInstance('input', {
     showInput: true
 });
 
-$("input").spectrum("option", "showInput"); // true
+sp.option("showInput"); // true
                 </pre>
                 <p>
                 Calling <code>option</code> with an option name and an option value will set the option to the new value.
                 </p>
                 <pre>
-$("input").spectrum({
+const sp = Spectrum.getInstance('input', {
     showInput: true
 });
 
-$("input").spectrum("option", "showInput", false);
-$("input").spectrum("option", "showInput"); // false
+sp.option("showInput", false);
+sp.option("showInput"); // false
                 </pre>
             </div>
         </div>
 
         <h2 id="details">Other</h2>
 
-        <h3 id="skinning-nonInput" class='point'>Non-input elements</h3>
+        <h3 id="skinning-nonInput" class="point">Non-input elements</h3>
         <p>
-            You can use any element you would like to trigger the colorpicker: <a href='#' id='openWithLink'>Click me to open a colorpicker</a>, though it is strongly recommended to stick with <code>&lt;input&gt;</code> tags.
+            You can use any element you would like to trigger the colorpicker: <a href="#" id="openWithLink">Click me to open a colorpicker</a>, though it is strongly recommended to stick with <code>&lt;input&gt;</code> tags.
         </p>
 
-        <h3 id="modes-input" class='point'>input[type=color]</h3>
-
-    <p>
-    If you just want to provide a polyfill for the native color input,
-    the easiest way is to create an input with the type of color.
-    Once a user's browser supports a native color control, it will opt to use their native control instead.
-    </p>
-    <p><strong>Unlike the other modes, your value must be a 6 character hex value starting with a '#'.</strong>  Why?  Because the spec <a href='http://dev.w3.org/html5/markup/input.color.html#input.color.attrs.value'>says so</a>, that's why.
-    </p>
-
 <pre id='code-subheading'>
-&lt;input type='color' name='color' /&gt;
-&lt;input type='color' name='color2' value='#3355cc' /&gt;
+&lt;input type="color" name="color" /&gt;
+&lt;input type="color" name="color2" value="#3355cc" /&gt;
 </pre>
-    <div class='example'>
+    <div class="example">
     <form method="get">
-        <input type='color' name='color' />
-        <input type='color' name='color2' value='#3355cc' />
-        <input type='color' name='color3' value='#000000' />
+        <input type="color" name="color" />
+        <input type="color" name="color2" value="#3355cc" />
+        <input type="color" name="color3" value="#000000" />
     </form>
     </div>
     <p><strong>That's it!</strong>
@@ -1035,27 +1137,19 @@ $("input").spectrum("option", "showInput"); // false
     so that they will still be able to manually enter a color.  You don't need to add a single line of code.
     </p>
 
-        <h3 id="details-browserSupport" class='point'>Browser Support</h3>
-        <p>I wanted this to work in the latest and greatest browsers, but also target backwords compatibility and <strong>mobile support</strong>.
+        <h3 id="details-browserSupport" class="point">Browser Support</h3>
+        <p>Spectrum Vanilla use ES2017 syntax and <strong>drop the IE support</strong>.
         Here are the currently supported browers:
         <ul>
-            <li>IE <small>6+</small></li>
-            <li>Chrome <small>4+</small></li>
-            <li>Firefox <small>3.6+</small></li>
-            <li>Safari <small>4+</small></li>
-            <li>Opera <small>11.1+</small></li>
-            <li>iOS</li>
+            <li>Chrome <small>54+</small></li>
+            <li>Firefox <small>47+</small></li>
+            <li>Safari <small>10.1+</small></li>
+            <li>Opera <small>41+</small></li>
+            <li>iOS <small>10.3+</small></li>
         </ul>
 
-        <h3 id="details-ieImplementation" class='point'>IE Implementation</h3>
-        <p>
-        IE Support is provided using
-        <a href='http://msdn.microsoft.com/en-us/library/ms532997(v=vs.85).aspx'>proprietary filters</a>.
-        Other browsers use CSS gradients.
-        </p>
 
-
-        <h3 id="details-acceptedColorInputs" class='point'>Accepted Color Inputs</h3>
+        <h3 id="details-acceptedColorInputs" class="point">Accepted Color Inputs</h3>
         <p>Spectrum will use the color passed in to initialize.  If there is no color passed in,
         it will try to parse a color based on the <code>value</code> of the input.  The color parsing is based on the <a href='https://github.com/bgrins/TinyColor'>TinyColor</a> plugin, and accepts many forms of input:</p>
 <pre>
@@ -1077,19 +1171,19 @@ hsv 0 100 100
 </pre>
         <p>It also provides the following forms of output:</p>
 <pre>
-var t = $("#element").spectrum("get");
-t.toHex()       // "ff0000"
-t.toHexString() // "#ff0000"
-t.toRgb()       // {"r":255,"g":0,"b":0}
-t.toRgbString() // "rgb(255, 0, 0)"
-t.toHsv()       // {"h":0,"s":1,"v":1}
-t.toHsvString() // "hsv(0, 100%, 100%)"
-t.toHsl()       // {"h":0,"s":1,"l":0.5}
-t.toHslString() // "hsl(0, 100%, 50%)"
-t.toName()      // "red"
+const sp = Spectrum.getInstance('#picker');
+sp.get().toHex()       // "ff0000"
+sp.get().toHexString() // "#ff0000"
+sp.get().toRgb()       // {"r":255,"g":0,"b":0}
+sp.get().toRgbString() // "rgb(255, 0, 0)"
+sp.get().toHsv()       // {"h":0,"s":1,"v":1}
+sp.get().toHsvString() // "hsv(0, 100%, 100%)"
+sp.get().toHsl()       // {"h":0,"s":1,"l":0.5}
+sp.get().toHslString() // "hsl(0, 100%, 50%)"
+sp.get().toName()      // "red"
 </pre>
 
-    <div class='footer'>
+    <div class="footer">
         <h2>Share</h2>
         <p>
         If you've made it this far, please share one of these links to help others find this project!
@@ -1100,7 +1194,7 @@ t.toName()      // "red"
         <a href='https://seballot.github.io/spectrum'>Spectrum colorpicker</a>
         </p>
         <p>
-        Thanks to all the <a href='https://github.com/seballot/spectrum/graphs/contributors'>spectrum contributors</a> for committing code, documentation, and <a href='https://github.com/seballot/spectrum/tree/master/i18n'>translations</a>.
+        Thanks to all the <a href='https://github.com/asika32764/spectrum-vanilla/graphs/contributors'>spectrum contributors</a> for committing code, documentation, and <a href='https://github.com/asika32764/spectrum-vanilla/tree/master/i18n'>translations</a>.
         </p>
     </div>
 
