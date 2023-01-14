@@ -12,8 +12,8 @@ Created by @bgrins and @seballot, modified by @asika32764
 Head over to the [Documentation Website](https://about.asika.tw/spectrum-vanilla/) for more information.
 
 ```html
-<script src='spectrum.js'></script>
-<link rel='stylesheet' href='spectrum.css' />
+<script src='dist/spectrum.js'></script>
+<link rel='stylesheet' href='dist/spectrum.css' />
 
 <input id='colorpicker' />
 
@@ -35,7 +35,7 @@ npm install spectrum-vanilla
 ### Using spectrum with a CDN
 
 ```html
-<script src="https://unpkg.com/spectrum-vanilla/dist/spectrum.min.js">
+<script src="https://unpkg.com/spectrum-vanilla/dist/spectrum.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://unpkg.com/spectrum-vanilla/dist/spectrum.min.css">
 
 <!-- Dark theme -->
