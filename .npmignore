@@ -1,0 +1,13 @@
+.idea
+.gitignore
+.editorconfig
+yarn.lock
+README.md
+
+/bin
+/src
+/docs
+/test
+/webpack.config.js
+/tsconfig.json
+/index.html
