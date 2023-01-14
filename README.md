@@ -1,52 +1,51 @@
 # Spectrum Vanilla
 
-![alt text](https://github.com/seballot/spectrum/blob/master/docs/spectrum.png?raw=true "Preview")
+![alt text](https://github.com/asika32764/spectrum-vanilla/blob/master/docs/spectrum.png?raw=true "Preview")
+
+Based on popular <a href="http://seballot.github.com/spectrum">Spectrum2</a> package. 
+This version rewrote with TypeScript and drop IE support.
 
 Created by @bgrins and @seballot, modified by @asika32764
 
 ### Basic Usage
 
-Head over to the [Documentation Website](http://seballot.github.io/spectrum) for more information.
+Head over to the [Documentation Website](https://about.asika.tw/spectrum-vanilla/) for more information.
 
-    <script src='spectrum.js'></script>
-    <link rel='stylesheet' href='spectrum.css' />
+```html
+<script src='spectrum.js'></script>
+<link rel='stylesheet' href='spectrum.css' />
 
-    <input id='colorpicker' />
+<input id='colorpicker' />
 
-    <script>
-        $("#colorpicker").spectrum({
-            color: "#f00"
-        });
-    </script>
+<script>
+    Spectrum.create("#colorpicker", {
+        color: "#f00"
+    });
+</script>
+```
 
 ### npm
 
 Spectrum is registered as package with npm. It can be installed with:
 
-    npm install spectrum-colorpicker2
+```shell
+npm install spectrum-vanilla
+```
 
 ### Using spectrum with a CDN
 
-    <script src="https://cdn.jsdelivr.net/npm/spectrum-colorpicker2/dist/spectrum.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/spectrum-colorpicker2/dist/spectrum.min.css">
+```html
+<script src="https://unpkg.com/spectrum-vanilla/dist/spectrum.min.js">
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/spectrum-vanilla/dist/spectrum.min.css">
+
+<!-- Dark theme -->
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/spectrum-vanilla/dist/spectrum-dark.min.css">
+```
 
 ### Download
 
-[Download latest version](https://github.com/seballot/spectrum/releases/latest)
-
-### Building Spectrum Locally
-
-If you'd like to run the development version, spectrum uses Grunt to automate the testing, linting, and building.  Head over to http://gruntjs.com/getting-started for more information. First, clone the repository, then run:
-
-    npm install -g grunt-cli
-    npm install
-
-    # runs jshint and the unit test suite
-    grunt
-
-    # runs jshint, the unit test suite, and builds a minified version of the file.
-    grunt build
+[Download latest version](https://github.com/asika32764/spectrum-vanilla/releases/latest)
 
 ### Internationalization
 
-If you are able to translate the text in the UI to another language, please do!  You can do so by either [filing a pull request](https://github.com/seballot/spectrum/pulls) or [opening an issue]( https://github.com/seballot/spectrum/issues) with the translation. The existing languages are listed at: https://github.com/seballot/spectrum/tree/master/src/i18n
+If you are able to translate the text in the UI to another language, please do!  You can do so by either [filing a pull request](https://github.com/asika32764/spectrum-vanilla/pulls) or [opening an issue]( https://github.com/asika32764/spectrum-vanilla/issues) with the translation. The existing languages are listed at: https://github.com/asika32764/spectrum-vanilla/tree/master/src/i18n
