@@ -45,20 +45,20 @@ exec(`yarn build:css:prod`);
 console.log(`>>> npm version ${args.join(' ')} --git-tag-version false`);
 exec(`npm version ${args.join(' ')} --git-tag-version false`);
 
-// console.log('>>> Git commit all');
-// exec(`git add .`);
-// try {
-//   exec(`git commit -am "Prepare release @windwalker-io/unicorn."`);
-// } catch (e) {
-//   console.log(e.message);
-// }
-//
-// const branch = cliInput['b'] || 'master';
-//
-// console.log('>>> Push to git');
-//
-// exec(`git push origin ${branch}`);
-//
-// console.log('>> Publish to npm');
-//
-// exec(`npm publish`);
+console.log('>>> Git commit all');
+exec(`git add .`);
+try {
+  exec(`git commit -am "Prepare release."`);
+} catch (e) {
+  console.log(e.message);
+}
+
+const branch = cliInput['b'] || 'master';
+
+console.log('>>> Push to git');
+
+exec(`git push origin ${branch}`);
+
+console.log('>> Publish to npm');
+
+exec(`npm publish`);
