@@ -1,5 +1,6 @@
 /// <reference types="jquery" />
 /// <reference types="jquery" />
+/// <reference types="jquery" />
 import { ColorInput } from 'tinycolor2';
 import { Options, SpLang, SpListener } from './types';
 import { OffsetCSSOptions } from './utils';
@@ -30,6 +31,7 @@ export default class Spectrum {
     private static wrap;
     private static wrapList;
     static locale(locale: string, localization: SpLang): typeof Spectrum;
+    static registerJQuery($: JQueryStatic): void;
     constructor(ele: HTMLInputElement, options?: Partial<Options>);
     get id(): number;
     get container(): HTMLElement;

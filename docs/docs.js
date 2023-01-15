@@ -223,7 +223,9 @@ $(function () {
   // });
 
   Spectrum.getInstance('#replacerClassName', {
-    replacerClassName: 'awesome'
+    replacerClassName: 'awesome',
+    allowEmpty: true,
+    color: ''
   });
 
   Spectrum.getInstance('#containerClassName', {
@@ -236,15 +238,18 @@ $(function () {
       [ 'black', 'white', 'blanchedalmond' ],
       [ 'rgb(255, 128, 0);', 'hsv 100 70 50', 'lightyellow' ]
     ],
-    hide: function (c) {
+    hide: function (e) {
+      var c = e.detail.color;
       var label = $('[data-label-for=' + this.id + ']');
       label.text('Hidden: ' + c.toHexString());
     },
-    change: function (c) {
+    change: function (e) {
+      var c = e.detail.color;
       var label = $('[data-label-for=' + this.id + ']');
       label.text('Change called: ' + c.toHexString());
     },
-    move: function (c) {
+    move: function (e) {
+      var c = e.detail.color;
       var label = $('[data-label-for=' + this.id + ']');
       label.text('Move called: ' + c.toHexString());
     }
@@ -261,11 +266,13 @@ $(function () {
         'rgb(255, 128, 0);', 'hsv 100 70 50' ],
       [ 'red', 'yellow', 'green', 'blue', 'violet' ]
     ],
-    change: function (c) {
+    change: function (e) {
+      var c = e.detail.color;
       var label = $('[data-label-for=' + this.id + ']');
       label.text('Change called: ' + c.toHexString());
     },
-    move: function (c) {
+    move: function (e) {
+      var c = e.detail.color;
       var label = $('[data-label-for=' + this.id + ']');
       label.text('Move called: ' + c.toHexString());
     }
@@ -281,11 +288,13 @@ $(function () {
         'rgb(255, 128, 0);', 'hsv 100 70 50' ],
       [ 'red', 'yellow', 'green', 'blue', 'violet' ]
     ],
-    change: function (c) {
+    change: function (e) {
+      var c = e.detail.color;
       var label = $('[data-label-for=' + this.id + ']');
       label.text('Change called: ' + c.toHexString());
     },
-    move: function (c) {
+    move: function (e) {
+      var c = e.detail.color;
       var label = $('[data-label-for=' + this.id + ']');
       label.text('Move called: ' + c.toHexString());
     }

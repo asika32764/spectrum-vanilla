@@ -259,7 +259,7 @@ function spectrum(element: HTMLElement, options: Partial<Options>) {
     toggleButton = container.querySelector('.sp-palette-toggle') as HTMLElement,
     isInput = boundElement.nodeName === 'INPUT',
     isInputTypeColor = isInput && boundElement.getAttribute('type') === 'color',
-    shouldReplace = isInput && type === 'color',
+    shouldReplace = isInput && (type === 'color' || isInputTypeColor),
     replacer = (shouldReplace)
       ? (() => {
         addClass(replaceInput, theme);
@@ -942,7 +942,7 @@ function spectrum(element: HTMLElement, options: Partial<Options>) {
         const textColor = (color.isLight() || color.getAlpha() < 0.4) ? 'black' : 'white';
         colorizeElement.style.backgroundColor = color.toRgbString();
         colorizeElement.style.color = textColor;
-      } else {
+      } else if (colorizeElement) {
         colorizeElement.style.backgroundColor = colorizeElementInitialBackground;
         colorizeElement.style.color = colorizeElementInitialColor;
       }
@@ -1385,6 +1385,10 @@ export default class Spectrum {
     return this;
   }
 
+  static registerJQuery($: JQueryStatic) {
+    registerJQueryPlugin($);
+  }
+
   constructor(ele: HTMLInputElement, options: Partial<Options> = {}) {
     this.spectrum = spectrum(ele, options);
     this.ele = ele;
@@ -1537,9 +1541,13 @@ export default class Spectrum {
 }
 
 // @ts-ignore
-const $ = window.$;
+const jQuery = window.jQuery;
 
-if ($) {
+if (jQuery) {
+  registerJQueryPlugin(jQuery);
+}
+
+function registerJQueryPlugin($: any) {
   // @ts-ignore
   $.fn.spectrum = function (action: string | undefined | Partial<Options> = undefined, ...args) {
     if (typeof action === "string") {

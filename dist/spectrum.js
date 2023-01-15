@@ -1738,7 +1738,7 @@ function spectrum(element, options) {
     toggleButton = container.querySelector('.sp-palette-toggle'),
     isInput = boundElement.nodeName === 'INPUT',
     isInputTypeColor = isInput && boundElement.getAttribute('type') === 'color',
-    shouldReplace = isInput && type === 'color',
+    shouldReplace = isInput && (type === 'color' || isInputTypeColor),
     replacer = shouldReplace ? (() => {
       (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(replaceInput, theme);
       (0,_utils__WEBPACK_IMPORTED_MODULE_1__.addClass)(replaceInput, opts.replacerClassName);
@@ -2320,7 +2320,7 @@ function spectrum(element, options) {
         const textColor = color.isLight() || color.getAlpha() < 0.4 ? 'black' : 'white';
         colorizeElement.style.backgroundColor = color.toRgbString();
         colorizeElement.style.color = textColor;
-      } else {
+      } else if (colorizeElement) {
         colorizeElement.style.backgroundColor = colorizeElementInitialBackground;
         colorizeElement.style.color = colorizeElementInitialColor;
       }
@@ -2668,6 +2668,9 @@ class Spectrum {
     this.localization[locale] = localization;
     return this;
   }
+  static registerJQuery($) {
+    registerJQueryPlugin($);
+  }
   constructor(ele) {
     let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     this.eventListeners = {};
@@ -2790,8 +2793,11 @@ Spectrum.draggable = draggable;
 Spectrum.localization = {};
 Spectrum.palette = [];
 // @ts-ignore
-const $ = window.$;
-if ($) {
+const jQuery = window.jQuery;
+if (jQuery) {
+  registerJQueryPlugin(jQuery);
+}
+function registerJQueryPlugin($) {
   // @ts-ignore
   $.fn.spectrum = function () {
     let action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;

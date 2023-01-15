@@ -90,8 +90,13 @@ import Spectrum from 'https://unpkg.com/spectrum-vanilla/dist/spectrum.es.min.js
     <h3>npm</h3>
     <pre>npm install spectrum-vanilla</pre>
 
+      <p>Import in Webpack / TypeScript</p>
+<pre>
+import Spectrum from 'spectrum-vanilla';
+</pre>
+
     <h3>Download files</h3>
-    <a href='https://github.com/asika32764/spectrum-vanilla/releases/latest' class="btn btn-primary">Download Zip</a>
+    <a href='https://github.com/asika32764/spectrum-vanilla/releases/' class="btn btn-primary">Download Zip</a>
 <pre>
 &lt;script src="spectrum.min.js">&lt;/script>
 &lt;link rel="stylesheet" type="text/css" href="spectrum.min.css">
@@ -165,6 +170,39 @@ const sp = $('#picker').spectrum();
 $('#picker').spectrum('show');
 
 $('#picker').spectrum('hide');
+</pre>
+
+      <p>If you use Spectrum in webpack and jQuery did not auto register, you can register it manually.</p>
+
+<pre>
+import Spectrum from 'spectrum-vanilla';
+import jQuery from 'jquery';
+
+Spectrum.registerJQuery(jQuery);
+
+const sp = jQuery('#picker').spectrum();
+</pre>
+
+      <h3>Vue</h3>
+
+      <p>A simple example that create a Vue3 directive</p>
+
+<pre>
+  const SpectrumDirective = {
+    mounted(el, { value }) {
+      const sp = Spectrum.getInstance(el, value || {});
+    },
+    updated(el, { value }) {
+      Spectrum.getInstance(el).rebuild(value || {});
+    }
+  };
+
+  app.directive('colorpicker', SpectrumDirective);
+  app.mount('...');
+</pre>
+
+<pre>
+  &lt;input type="text" v-colorpciker="{ type: 'component' }">
 </pre>
 
 
@@ -678,7 +716,7 @@ Spectrum.getInstance('#replacerClassName', {
             </style>
 
             <div class="example">
-                    <input type="text" name="replacerClassName" id="replacerClassName" value="orangered" />
+                    <input type="color" name="replacerClassName" id="replacerClassName" value="" />
             </div>
         </div>
 
@@ -745,7 +783,8 @@ Spectrum.getInstance('#preferredNone', {
         <h3 id="options-appendTo">appendTo</h3>
         <div class='option-content'>
             <div class="description">
-                <p>You can choose which element the colorpicker container is appended to (default is <code>"body"</code>). This can be any valid object taken into the jQuery <a href="https://api.jquery.com/appendTo/">appendTo</a> function.</p>
+                <p>You can choose which element the colorpicker container is appended to (default is <code>"body"</code>).
+                  This can be any valid DOMElement object or selector string.</p>
                 <p>Changing this can help resolve issues with opening the colorpicker in a modal dialog or fixed position container, for instance.</p>
             </div>
 
