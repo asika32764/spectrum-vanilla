@@ -1643,7 +1643,9 @@ function hideAll() {
     }
   }
 }
-function instanceOptions(options, callbackContext) {
+function instanceOptions(options, element) {
+  // Clone first
+  options = Object.assign({}, options);
   options.locale = options.locale || window.navigator.language;
   if (typeof options.locale === 'string') {
     if (options.locale) {
@@ -1661,13 +1663,13 @@ function instanceOptions(options, callbackContext) {
   } else {
     options = Object.assign({}, options, options.locale);
   }
-  const opts = Object.assign({}, defaultOpts, options);
+  const opts = Object.assign({}, defaultOpts, element.dataset, options);
   opts.callbacks = {
-    'move': bind(opts.move, callbackContext),
-    'change': bind(opts.change, callbackContext),
-    'show': bind(opts.show, callbackContext),
-    'hide': bind(opts.hide, callbackContext),
-    'beforeShow': bind(opts.beforeShow, callbackContext)
+    'move': bind(opts.move, element),
+    'change': bind(opts.change, element),
+    'show': bind(opts.show, element),
+    'hide': bind(opts.hide, element),
+    'beforeShow': bind(opts.beforeShow, element)
   };
   return opts;
 }
@@ -2391,7 +2393,7 @@ function spectrum(element, options) {
     (0,_utils__WEBPACK_IMPORTED_MODULE_1__.emit)(boundElement, 'reflow');
   }
   function destroy() {
-    boundElement.style.display = 'inline-block';
+    delete boundElement.style.display;
     boundElement.classList.remove('spectrum', 'with-add-on', 'sp-colorize');
     offsetElement.removeEventListener('click', offsetElementStart);
     offsetElement.removeEventListener('touchstart', offsetElementStart);

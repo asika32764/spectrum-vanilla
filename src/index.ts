@@ -163,7 +163,10 @@ function hideAll() {
   }
 }
 
-function instanceOptions(options: Partial<SpectrumOptions>, callbackContext: object): SpectrumOptions {
+function instanceOptions(options: Partial<SpectrumOptions>, element: HTMLElement): SpectrumOptions {
+  // Clone first
+  options = Object.assign({}, options);
+
   options.locale = options.locale || window.navigator.language;
 
   if (typeof options.locale === 'string') {
@@ -187,14 +190,14 @@ function instanceOptions(options: Partial<SpectrumOptions>, callbackContext: obj
     options = Object.assign({}, options, options.locale);
   }
 
-  const opts = Object.assign({}, defaultOpts, options) as SpectrumOptions;
+  const opts = Object.assign({}, defaultOpts, element.dataset, options) as SpectrumOptions;
 
   opts.callbacks = {
-    'move': bind(opts.move as Function, callbackContext),
-    'change': bind(opts.change as Function, callbackContext),
-    'show': bind(opts.show as Function, callbackContext),
-    'hide': bind(opts.hide as Function, callbackContext),
-    'beforeShow': bind(opts.beforeShow as Function, callbackContext),
+    'move': bind(opts.move as Function, element),
+    'change': bind(opts.change as Function, element),
+    'show': bind(opts.show as Function, element),
+    'hide': bind(opts.hide as Function, element),
+    'beforeShow': bind(opts.beforeShow as Function, element),
   };
 
   return opts;
@@ -1045,7 +1048,7 @@ function spectrum(element: HTMLElement, options: Partial<SpectrumOptions>) {
   }
 
   function destroy() {
-    boundElement.style.display = 'inline-block';
+    delete boundElement.style.display;
     boundElement.classList.remove('spectrum', 'with-add-on', 'sp-colorize');
     offsetElement.removeEventListener('click', offsetElementStart);
     offsetElement.removeEventListener('touchstart', offsetElementStart);

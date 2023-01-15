@@ -4,13 +4,15 @@
   <meta charset="UTF-8">
   <title>Title</title>
   <script src="../dist/spectrum.js"></script>
+  <script src="../dist/i18n/zh-tw.js"></script>
   <link rel="stylesheet" href="../dist/spectrum.css" />
 </head>
 <body>
-<input type="color" name="" id="picker" />
+<input type="color" name="" id="picker" data-locale="zh-tw" />
 
 <script>
-  Spectrum.create('#picker', { replacerClassName: 'hello' });
+  const options = { replacerClassName: 'hello' };
+  Spectrum.create('#picker', options);
 </script>
 </body>
 </html>
