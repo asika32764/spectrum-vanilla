@@ -190,10 +190,18 @@ const sp = jQuery('#picker').spectrum();
 <pre>
   const SpectrumDirective = {
     mounted(el, { value }) {
-      const sp = Spectrum.getInstance(el, value || {});
+      Spectrum.getInstance(el, Object.assign({}, value));
     },
     updated(el, { value }) {
-      Spectrum.getInstance(el).rebuild(value || {});
+      const sp = Spectrum.getInstance(el, options);
+
+      if (JSON.stringify(value) !== JSON.stringify(sp.options)) {
+        sp.rebuild(Object.assign({}, value));
+      }
+    },
+    unmounted(el) {
+      const sp = Spectrum.getInstance(el);
+      sp.destroy();
     }
   };
 
