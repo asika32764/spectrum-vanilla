@@ -12,7 +12,9 @@
 
 <script>
   const options = { replacerClassName: 'hello' };
-  Spectrum.create('#picker', options);
+  const sp = Spectrum.create('#picker', options);
+
+  const r = sp.option('allowEmpty', true)
 </script>
 </body>
 </html>

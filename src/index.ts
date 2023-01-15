@@ -1252,7 +1252,7 @@ function draggable(
 
 export default class Spectrum {
   private spectrum: any;
-  public ele: HTMLInputElement;
+  public ele: HTMLElement;
   public options: Partial<SpectrumOptions>;
   public eventListeners: { [event: string]: EventListener[] } = {};
 
@@ -1326,13 +1326,13 @@ export default class Spectrum {
     return instances;
   }
 
-  private static wrap(selector: string | JQuery | HTMLElement) {
+  private static wrap(selector: string | JQuery | HTMLElement): HTMLElement|null {
     if (typeof selector === 'string') {
       return document.querySelector<HTMLElement>(selector);
     } else if ((selector as JQuery).jquery) {
       return selector[0];
     } else {
-      return selector;
+      return selector as HTMLElement;
     }
   }
 
@@ -1355,7 +1355,7 @@ export default class Spectrum {
     registerJQueryPlugin($);
   }
 
-  constructor(ele: HTMLInputElement, options: Partial<SpectrumOptions> = {}) {
+  constructor(ele: HTMLElement, options: Partial<SpectrumOptions> = {}) {
     this.spectrum = spectrum(ele, options);
     this.ele = ele;
     this.options = options;
@@ -1394,7 +1394,10 @@ export default class Spectrum {
     return this;
   }
 
-  option(optionName: string | undefined = undefined, optionValue: any = undefined): any {
+  option(): SpectrumOptions;
+  option<T extends keyof SpectrumOptions>(optionName?: T): SpectrumOptions[T];
+  option<T extends keyof SpectrumOptions>(optionName: T, optionValue: SpectrumOptions[T]): Spectrum
+  option<T extends keyof SpectrumOptions>(optionName?: T, optionValue?: SpectrumOptions[T]): any {
     return this.spectrum.option(optionName, optionValue);
   }
 
