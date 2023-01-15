@@ -57,7 +57,7 @@ const branch = cliInput['b'] || 'master';
 
 console.log('>>> Push to git');
 
-exec(`git push origin ${branch}`);
+exec(`git push origin ${branch} --tags`);
 
 console.log('>> Publish to npm');
 
