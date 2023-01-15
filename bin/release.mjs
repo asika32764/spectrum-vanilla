@@ -42,9 +42,6 @@ exec(`yarn build:css`);
 console.log(`>>> yarn build:css:prod`);
 exec(`yarn build:css:prod`);
 
-console.log(`>>> npm version ${args.join(' ')}`);
-exec(`npm version ${args.join(' ')}`);
-
 console.log('>>> Git commit all');
 exec(`git add .`);
 try {
@@ -52,6 +49,9 @@ try {
 } catch (e) {
   console.log(e.message);
 }
+
+console.log(`>>> npm version ${args.join(' ')}`);
+exec(`npm version ${args.join(' ')}`);
 
 const branch = cliInput['b'] || 'master';
 

@@ -1,6 +1,6 @@
 import tinycolor, { ColorInput, Instance } from 'tinycolor2';
 import { insertAfter, outerWidthWithMargin, wrap } from './dom';
-import { ColorFormat, Options, SpLang, SpListener } from './types';
+import { SpectrumColorFormat, SpectrumOptions, SpectrumLang, SpectrumListener } from './types';
 import {
   addClass,
   emit,
@@ -14,7 +14,7 @@ import {
   toggleClass,
 } from './utils';
 
-const defaultOpts: Partial<Options> = {
+const defaultOpts: Partial<SpectrumOptions> = {
 
     // Callbacks
     beforeShow: noop,
@@ -163,7 +163,7 @@ function hideAll() {
   }
 }
 
-function instanceOptions(options: Partial<Options>, callbackContext: object): Options {
+function instanceOptions(options: Partial<SpectrumOptions>, callbackContext: object): SpectrumOptions {
   options.locale = options.locale || window.navigator.language;
 
   if (typeof options.locale === 'string') {
@@ -187,7 +187,7 @@ function instanceOptions(options: Partial<Options>, callbackContext: object): Op
     options = Object.assign({}, options, options.locale);
   }
 
-  const opts = Object.assign({}, defaultOpts, options) as Options;
+  const opts = Object.assign({}, defaultOpts, options) as SpectrumOptions;
 
   opts.callbacks = {
     'move': bind(opts.move as Function, callbackContext),
@@ -200,7 +200,7 @@ function instanceOptions(options: Partial<Options>, callbackContext: object): Op
   return opts;
 }
 
-function spectrum(element: HTMLElement, options: Partial<Options>) {
+function spectrum(element: HTMLElement, options: Partial<SpectrumOptions>) {
 
   let opts = instanceOptions(options, element),
     type = opts.type,
@@ -558,7 +558,7 @@ function spectrum(element: HTMLElement, options: Partial<Options>) {
       // In case color was black - update the preview UI and set the format
       // since the set function will not run (default color is black).
       updateUI();
-      currentPreferredFormat = tinycolor(initialColor).getFormat() as ColorFormat || opts.preferredFormat;
+      currentPreferredFormat = tinycolor(initialColor).getFormat() as SpectrumColorFormat || opts.preferredFormat;
       addColorToSelectionPalette(initialColor);
     } else if (initialColor === '') {
       set(initialColor);
@@ -838,7 +838,7 @@ function spectrum(element: HTMLElement, options: Partial<Options>) {
     updateUI();
 
     if (newColor && newColor.isValid() && !ignoreFormatChange) {
-      currentPreferredFormat = opts.preferredFormat || newColor.getFormat() as ColorFormat;
+      currentPreferredFormat = opts.preferredFormat || newColor.getFormat() as SpectrumColorFormat;
     }
   }
 
@@ -1287,15 +1287,15 @@ function draggable(
 export default class Spectrum {
   private spectrum: any;
   public ele: HTMLInputElement;
-  public options: Partial<Options>;
+  public options: Partial<SpectrumOptions>;
   public eventListeners: { [event: string]: EventListener[] } = {};
 
   static defaultOptions = defaultOpts;
   static draggable = draggable;
-  static localization: { [locale: string]: SpLang } = {};
+  static localization: { [locale: string]: SpectrumLang } = {};
   static palette: string[][] = [];
 
-  static create(selector: string | HTMLElement, options: Partial<Options> = {}): Spectrum {
+  static create(selector: string | HTMLElement, options: Partial<SpectrumOptions> = {}): Spectrum {
     const ele = this.wrap(selector);
 
     if (!ele) {
@@ -1310,7 +1310,7 @@ export default class Spectrum {
     return new this(ele, options);
   }
 
-  static createIfExists(selector: string | HTMLElement, options: Partial<Options> = {}): Spectrum|null {
+  static createIfExists(selector: string | HTMLElement, options: Partial<SpectrumOptions> = {}): Spectrum|null {
     const ele = this.wrap(selector);
 
     if (!ele) {
@@ -1320,7 +1320,7 @@ export default class Spectrum {
     return new this(ele, options);
   }
 
-  static getInstance(selector: string | HTMLElement, options: Partial<Options> = {}): Spectrum {
+  static getInstance(selector: string | HTMLElement, options: Partial<SpectrumOptions> = {}): Spectrum {
     const ele = this.wrap(selector);
 
     // @ts-ignore
@@ -1336,7 +1336,7 @@ export default class Spectrum {
 
   static createMultiple(
     selector: string | NodeListOf<HTMLElement>,
-    options: Partial<Options> = {}
+    options: Partial<SpectrumOptions> = {}
   ) {
     const instances: Spectrum[] = [];
 
@@ -1349,7 +1349,7 @@ export default class Spectrum {
 
   static getInstanceMultiple(
     selector: string | JQuery | NodeListOf<HTMLElement>,
-    options: Partial<Options> = {},
+    options: Partial<SpectrumOptions> = {},
   ) {
     const instances: Spectrum[] = [];
 
@@ -1380,7 +1380,7 @@ export default class Spectrum {
     }
   }
 
-  static locale(locale: string, localization: SpLang) {
+  static locale(locale: string, localization: SpectrumLang) {
     this.localization[locale] = localization;
     return this;
   }
@@ -1389,7 +1389,7 @@ export default class Spectrum {
     registerJQueryPlugin($);
   }
 
-  constructor(ele: HTMLInputElement, options: Partial<Options> = {}) {
+  constructor(ele: HTMLInputElement, options: Partial<SpectrumOptions> = {}) {
     this.spectrum = spectrum(ele, options);
     this.ele = ele;
     this.options = options;
@@ -1463,7 +1463,7 @@ export default class Spectrum {
     return this;
   }
 
-  rebuild(options?: Partial<Options>) {
+  rebuild(options?: Partial<SpectrumOptions>) {
     this.destroyInnerObject();
     if (options) {
       this.options = Object.assign({}, this.options, options);
@@ -1483,7 +1483,7 @@ export default class Spectrum {
 
   on(
     eventName: string,
-    listener: SpListener,
+    listener: SpectrumListener,
     options: AddEventListenerOptions|undefined = undefined
   ): Function {
     this.ele.addEventListener(eventName, listener, options);
@@ -1499,7 +1499,7 @@ export default class Spectrum {
 
   once(
     eventName: string,
-    listener: SpListener,
+    listener: SpectrumListener,
     options: AddEventListenerOptions|undefined = undefined
   ): Function {
     const cancel = this.on(
@@ -1515,7 +1515,7 @@ export default class Spectrum {
     return cancel;
   }
 
-  off(eventName: string = undefined, listener: EventListener|SpListener|undefined = undefined) {
+  off(eventName: string = undefined, listener: EventListener|SpectrumListener|undefined = undefined) {
     if (eventName && !this.eventListeners[eventName]) {
       return;
     }
@@ -1549,7 +1549,7 @@ if (jQuery) {
 
 function registerJQueryPlugin($: any) {
   // @ts-ignore
-  $.fn.spectrum = function (action: string | undefined | Partial<Options> = undefined, ...args) {
+  $.fn.spectrum = function (action: string | undefined | Partial<SpectrumOptions> = undefined, ...args) {
     if (typeof action === "string") {
       let returnValue = this;
       this.each(function () {
@@ -1581,7 +1581,7 @@ function registerJQueryPlugin($: any) {
 
     // Initializing a new instance of spectrum
     return this.each(function () {
-      const options: Options = $.extend({}, $(this).data(), action);
+      const options: SpectrumOptions = $.extend({}, $(this).data(), action);
       // Infer default type from input params and deprecated options
       if (!$(this).is('input')) {
         options.type = 'color';

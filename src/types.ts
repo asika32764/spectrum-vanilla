@@ -1,5 +1,3 @@
-import { OffsetCSSOptions } from './utils';
-
 /**
  * Part of spectrum-vanilla project.
  *
@@ -7,25 +5,26 @@ import { OffsetCSSOptions } from './utils';
  * @license    __LICENSE__
  */
 
+import { OffsetCSSOptions } from './utils';
 import { Instance as Tinycolor } from 'tinycolor2';
 
-export type SpEvent = CustomEvent<{ color: Tinycolor }>;
-export type SpListener = (event: SpEvent) => any;
+export type SpectrumEvent = CustomEvent<{ color: Tinycolor }>;
+export type SpectrumListener = (event: SpectrumEvent) => any;
 
-export interface Options {
+export interface SpectrumOptions {
   callbacks: {
-    beforeShow: SpListener;
-    move: SpListener,
-    change: SpListener,
-    show: SpListener;
-    hide: SpListener;
+    beforeShow: SpectrumListener;
+    move: SpectrumListener,
+    change: SpectrumListener,
+    show: SpectrumListener;
+    hide: SpectrumListener;
   }
 
-  beforeShow?: SpListener,
-  move?: SpListener,
-  change?: SpListener,
-  show?:  SpListener,
-  hide?: SpListener;
+  beforeShow?: SpectrumListener,
+  move?: SpectrumListener,
+  change?: SpectrumListener,
+  show?:  SpectrumListener,
+  hide?: SpectrumListener;
 
   // Options
   color: string;
@@ -43,14 +42,14 @@ export interface Options {
   localStorageKey: string;
   appendTo: string;
   maxSelectionSize: number;
-  locale: string|SpLang;
+  locale: string|SpectrumLang;
   cancelText: string;
   chooseText: string;
   togglePaletteMoreText: string;
   togglePaletteLessText:string;
   clearText: string;
   noColorSelectedText: string;
-  preferredFormat: ColorFormat;
+  preferredFormat: SpectrumColorFormat;
   containerClassName: string;
   replacerClassName: string;
   showAlpha: boolean;
@@ -61,9 +60,9 @@ export interface Options {
   offset: OffsetCSSOptions|null;
 }
 
-export type ColorFormat = "rgb" | "prgb" | "hex" | "hex6" | "hex3" | "hex4" | "hex8" | "name" | "hsl" | "hsv";
+export type SpectrumColorFormat = "rgb" | "prgb" | "hex" | "hex6" | "hex3" | "hex4" | "hex8" | "name" | "hsl" | "hsv";
 
-export interface SpLang {
+export interface SpectrumLang {
   cancelText?: string,
   chooseText?: string,
   clearText?: string,

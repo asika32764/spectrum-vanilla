@@ -1,28 +1,28 @@
-import { OffsetCSSOptions } from './utils';
 /**
  * Part of spectrum-vanilla project.
  *
  * @copyright  Copyright (C) 2023 __ORGANIZATION__.
  * @license    __LICENSE__
  */
+import { OffsetCSSOptions } from './utils';
 import { Instance as Tinycolor } from 'tinycolor2';
-export type SpEvent = CustomEvent<{
+export type SpectrumEvent = CustomEvent<{
     color: Tinycolor;
 }>;
-export type SpListener = (event: SpEvent) => any;
-export interface Options {
+export type SpectrumListener = (event: SpectrumEvent) => any;
+export interface SpectrumOptions {
     callbacks: {
-        beforeShow: SpListener;
-        move: SpListener;
-        change: SpListener;
-        show: SpListener;
-        hide: SpListener;
+        beforeShow: SpectrumListener;
+        move: SpectrumListener;
+        change: SpectrumListener;
+        show: SpectrumListener;
+        hide: SpectrumListener;
     };
-    beforeShow?: SpListener;
-    move?: SpListener;
-    change?: SpListener;
-    show?: SpListener;
-    hide?: SpListener;
+    beforeShow?: SpectrumListener;
+    move?: SpectrumListener;
+    change?: SpectrumListener;
+    show?: SpectrumListener;
+    hide?: SpectrumListener;
     color: string;
     type: 'color' | 'text' | 'component' | 'flat';
     showInput: boolean;
@@ -38,14 +38,14 @@ export interface Options {
     localStorageKey: string;
     appendTo: string;
     maxSelectionSize: number;
-    locale: string | SpLang;
+    locale: string | SpectrumLang;
     cancelText: string;
     chooseText: string;
     togglePaletteMoreText: string;
     togglePaletteLessText: string;
     clearText: string;
     noColorSelectedText: string;
-    preferredFormat: ColorFormat;
+    preferredFormat: SpectrumColorFormat;
     containerClassName: string;
     replacerClassName: string;
     showAlpha: boolean;
@@ -55,8 +55,8 @@ export interface Options {
     disabled: boolean;
     offset: OffsetCSSOptions | null;
 }
-export type ColorFormat = "rgb" | "prgb" | "hex" | "hex6" | "hex3" | "hex4" | "hex8" | "name" | "hsl" | "hsv";
-export interface SpLang {
+export type SpectrumColorFormat = "rgb" | "prgb" | "hex" | "hex6" | "hex3" | "hex4" | "hex8" | "name" | "hsl" | "hsv";
+export interface SpectrumLang {
     cancelText?: string;
     chooseText?: string;
     clearText?: string;
