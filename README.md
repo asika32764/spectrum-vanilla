@@ -49,3 +49,22 @@ npm install spectrum-vanilla
 ### Internationalization
 
 If you are able to translate the text in the UI to another language, please do!  You can do so by either [filing a pull request](https://github.com/asika32764/spectrum-vanilla/pulls) or [opening an issue]( https://github.com/asika32764/spectrum-vanilla/issues) with the translation. The existing languages are listed at: https://github.com/asika32764/spectrum-vanilla/tree/master/src/i18n
+
+## Contribution
+
+I'm just a maintainer, if you need some new features or found a bug, feel free to open a Pull-Request.
+
+## Building
+
+```shell
+yarn build # build uncompressed JS
+yarn watch # build and watch
+yarn build:es # build ES version
+yarn build:css # build css files
+```
+
+More actions please see `package.json`
+
+## Test
+
+Modify `test/tests.js` and open `test/index.html` to check the test result.
