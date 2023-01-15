@@ -44,7 +44,7 @@ npm install spectrum-vanilla
 
 ### Download
 
-[Download latest version](https://github.com/asika32764/spectrum-vanilla/releases/latest)
+[Download latest version](https://github.com/asika32764/spectrum-vanilla/releases)
 
 ### Internationalization
 
