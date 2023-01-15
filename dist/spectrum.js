@@ -1609,27 +1609,9 @@ const defaultOpts = {
     offset: null
   },
   spectrums = [],
-  IE = !!/msie/i.exec(window.navigator.userAgent),
-  rgbaSupport = (() => {
-    function contains(str, substr) {
-      return !!~('' + str).indexOf(substr);
-    }
-    const elem = document.createElement('div');
-    const style = elem.style;
-    style.cssText = 'background-color:rgba(0,0,0,.5)';
-    return contains(style.backgroundColor, 'rgba') || contains(style.backgroundColor, 'hsla');
-  })(),
   replaceInput = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.html)(['<div class=\'sp-replacer\'>', '<div class=\'sp-preview\'><div class=\'sp-preview-inner\'></div></div>', '<div class=\'sp-dd\'>&#9660;</div>', '</div>'].join('')),
   markup = function () {
-    // IE does not support gradients with multiple stops, so we need to simulate
-    //  that for the rainbow slider with 8 divs that each have a single gradient
-    let gradientFix = '';
-    if (IE) {
-      for (let i = 1; i <= 6; i++) {
-        gradientFix += '<div class=\'sp-' + i + '\'></div>';
-      }
-    }
-    return ['<div class=\'sp-container sp-hidden\'>', '<div class=\'sp-palette-container\'>', '<div class=\'sp-palette sp-thumb sp-cf\'></div>', '<div class=\'sp-palette-button-container sp-cf\'>', '<button type=\'button\' class=\'sp-palette-toggle\'></button>', '</div>', '</div>', '<div class=\'sp-picker-container\'>', '<div class=\'sp-top sp-cf\'>', '<div class=\'sp-fill\'></div>', '<div class=\'sp-top-inner\'>', '<div class=\'sp-color\'>', '<div class=\'sp-sat\'>', '<div class=\'sp-val\'>', '<div class=\'sp-dragger\'></div>', '</div>', '</div>', '</div>', '<div class=\'sp-clear sp-clear-display\'>', '</div>', '<div class=\'sp-hue\'>', '<div class=\'sp-slider\'></div>', gradientFix, '</div>', '</div>', '<div class=\'sp-alpha\'><div class=\'sp-alpha-inner\'><div class=\'sp-alpha-handle\'></div></div></div>', '</div>', '<div class=\'sp-input-container sp-cf\'>', '<input class=\'sp-input\' type=\'text\' spellcheck=\'false\'  />', '</div>', '<div class=\'sp-initial sp-thumb sp-cf\'></div>', '<div class=\'sp-button-container sp-cf\'>', '<button class=\'sp-cancel\' href=\'#\'></button>', '<button type=\'button\' class=\'sp-choose\'></button>', '</div>', '</div>', '</div>'].join('');
+    return ['<div class=\'sp-container sp-hidden\'>', '<div class=\'sp-palette-container\'>', '<div class=\'sp-palette sp-thumb sp-cf\'></div>', '<div class=\'sp-palette-button-container sp-cf\'>', '<button type=\'button\' class=\'sp-palette-toggle\'></button>', '</div>', '</div>', '<div class=\'sp-picker-container\'>', '<div class=\'sp-top sp-cf\'>', '<div class=\'sp-fill\'></div>', '<div class=\'sp-top-inner\'>', '<div class=\'sp-color\'>', '<div class=\'sp-sat\'>', '<div class=\'sp-val\'>', '<div class=\'sp-dragger\'></div>', '</div>', '</div>', '</div>', '<div class=\'sp-clear sp-clear-display\'>', '</div>', '<div class=\'sp-hue\'>', '<div class=\'sp-slider\'></div>', '</div>', '</div>', '<div class=\'sp-alpha\'><div class=\'sp-alpha-inner\'><div class=\'sp-alpha-handle\'></div></div></div>', '</div>', '<div class=\'sp-input-container sp-cf\'>', '<input class=\'sp-input\' type=\'text\' spellcheck=\'false\'  />', '</div>', '<div class=\'sp-initial sp-thumb sp-cf\'></div>', '<div class=\'sp-button-container sp-cf\'>', '<button class=\'sp-cancel\' href=\'#\'></button>', '<button type=\'button\' class=\'sp-choose\'></button>', '</div>', '</div>', '</div>'].join('');
   }();
 function paletteTemplate(p, color, className, opts) {
   const html = [];
@@ -1640,7 +1622,7 @@ function paletteTemplate(p, color, className, opts) {
       let c = tiny.toHsl().l < 0.5 ? 'sp-thumb-el sp-thumb-dark' : 'sp-thumb-el sp-thumb-light';
       c += tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"].equals(color, current) ? ' sp-thumb-active' : '';
       const formattedString = tiny.toString(opts.preferredFormat || 'rgb');
-      const swatchStyle = rgbaSupport ? 'background-color:' + tiny.toRgbString() : 'filter:' + tiny.toFilter();
+      const swatchStyle = 'background-color:' + tiny.toRgbString();
       html.push('<span title="' + formattedString + '" data-color="' + tiny.toRgbString() + '" class="' + c + '"><span class="sp-thumb-inner" style="' + swatchStyle + ';"></span></span>');
     } else {
       html.push('<span class="sp-thumb-el sp-clear-display" ><span class="sp-clear-palette-only" style="background-color: transparent;"></span></span>');
@@ -2287,7 +2269,7 @@ function spectrum(element, options) {
       const realRgb = realColor.toRgbString();
       if (previewElement) {
         // Update the replaced elements background color (with actual selected color)
-        if (rgbaSupport || realColor.getAlpha() === 1) {
+        if (realColor.getAlpha() === 1) {
           previewElement.style.backgroundColor = realRgb;
         } else {
           previewElement.style.backgroundColor = 'transparent';
@@ -2298,16 +2280,7 @@ function spectrum(element, options) {
         const rgb = realColor.toRgb();
         rgb.a = 0;
         const realAlpha = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(rgb).toRgbString();
-        const gradient = 'linear-gradient(left, ' + realAlpha + ', ' + realHex + ')';
-        if (IE) {
-          alphaSliderInner.style.filter = (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])(realAlpha).toFilter( /* { gradientType: 1 }, realHex */);
-        } else {
-          // alphaSliderInner.css('background', '-webkit-' + gradient);
-          // alphaSliderInner.css('background', '-moz-' + gradient);
-          // alphaSliderInner.css('background', '-ms-' + gradient);
-          // Use current syntax gradient on unprefixed property.
-          alphaSliderInner.style.background = `linear-gradient(to right, ${realAlpha}, ${realHex})`;
-        }
+        alphaSliderInner.style.background = `linear-gradient(to right, ${realAlpha}, ${realHex})`;
       }
       displayColor = realColor.toString(format);
     }
@@ -2549,11 +2522,6 @@ function draggable(element, onmove, onstart, onstop) {
   }
   function move(e) {
     if (dragging) {
-      // @ts-ignore
-      // Mouseup happened outside of window
-      if (IE && doc.documentMode < 9 && !e.button) {
-        return stop();
-      }
       const t0 = 'touches' in e && e.touches[0];
       const pageX = t0 && t0.pageX || e.pageX;
       const pageY = t0 && t0.pageY || e.pageY;

@@ -66,17 +66,6 @@ const defaultOpts: Partial<SpectrumOptions> = {
     offset: null,
   },
   spectrums: any[] = [],
-  IE = !!/msie/i.exec(window.navigator.userAgent),
-  rgbaSupport = (() => {
-    function contains(str: string, substr: string) {
-      return !!~('' + str).indexOf(substr);
-    }
-
-    const elem = document.createElement('div');
-    const style = elem.style;
-    style.cssText = 'background-color:rgba(0,0,0,.5)';
-    return contains(style.backgroundColor, 'rgba') || contains(style.backgroundColor, 'hsla');
-  })(),
   replaceInput = html(
     [
       '<div class=\'sp-replacer\'>',
@@ -86,16 +75,6 @@ const defaultOpts: Partial<SpectrumOptions> = {
     ].join(''),
   ) as HTMLElement,
   markup = (function () {
-
-    // IE does not support gradients with multiple stops, so we need to simulate
-    //  that for the rainbow slider with 8 divs that each have a single gradient
-    let gradientFix = '';
-    if (IE) {
-      for (let i = 1; i <= 6; i++) {
-        gradientFix += '<div class=\'sp-' + i + '\'></div>';
-      }
-    }
-
     return [
       '<div class=\'sp-container sp-hidden\'>',
       '<div class=\'sp-palette-container\'>',
@@ -119,7 +98,6 @@ const defaultOpts: Partial<SpectrumOptions> = {
       '</div>',
       '<div class=\'sp-hue\'>',
       '<div class=\'sp-slider\'></div>',
-      gradientFix,
       '</div>',
       '</div>',
       '<div class=\'sp-alpha\'><div class=\'sp-alpha-inner\'><div class=\'sp-alpha-handle\'></div></div></div>',
@@ -146,7 +124,7 @@ function paletteTemplate(p: ColorInput[], color: ColorInput, className: string, 
       let c = tiny.toHsl().l < 0.5 ? 'sp-thumb-el sp-thumb-dark' : 'sp-thumb-el sp-thumb-light';
       c += (tinycolor.equals(color, current)) ? ' sp-thumb-active' : '';
       const formattedString = tiny.toString(opts.preferredFormat || 'rgb');
-      const swatchStyle = rgbaSupport ? ('background-color:' + tiny.toRgbString()) : 'filter:' + tiny.toFilter();
+      const swatchStyle = 'background-color:' + tiny.toRgbString();
       html.push('<span title="' + formattedString + '" data-color="' + tiny.toRgbString() + '" class="' + c + '"><span class="sp-thumb-inner" style="' + swatchStyle + ';"></span></span>');
     } else {
       html.push('<span class="sp-thumb-el sp-clear-display" ><span class="sp-clear-palette-only" style="background-color: transparent;"></span></span>');
@@ -906,7 +884,7 @@ function spectrum(element: HTMLElement, options: Partial<SpectrumOptions>) {
 
       if (previewElement) {
         // Update the replaced elements background color (with actual selected color)
-        if (rgbaSupport || realColor.getAlpha() === 1) {
+        if (realColor.getAlpha() === 1) {
           previewElement.style.backgroundColor = realRgb;
         } else {
           previewElement.style.backgroundColor = 'transparent';
@@ -918,17 +896,8 @@ function spectrum(element: HTMLElement, options: Partial<SpectrumOptions>) {
         const rgb = realColor.toRgb();
         rgb.a = 0;
         const realAlpha = tinycolor(rgb).toRgbString();
-        const gradient = 'linear-gradient(left, ' + realAlpha + ', ' + realHex + ')';
 
-        if (IE) {
-          alphaSliderInner.style.filter = tinycolor(realAlpha).toFilter(/* { gradientType: 1 }, realHex */);
-        } else {
-          // alphaSliderInner.css('background', '-webkit-' + gradient);
-          // alphaSliderInner.css('background', '-moz-' + gradient);
-          // alphaSliderInner.css('background', '-ms-' + gradient);
-          // Use current syntax gradient on unprefixed property.
-          alphaSliderInner.style.background = `linear-gradient(to right, ${realAlpha}, ${realHex})`;
-        }
+        alphaSliderInner.style.background = `linear-gradient(to right, ${realAlpha}, ${realHex})`;
       }
 
       displayColor = realColor.toString(format);
@@ -1222,12 +1191,6 @@ function draggable(
 
   function move(e: TouchEvent | MouseEvent) {
     if (dragging) {
-      // @ts-ignore
-      // Mouseup happened outside of window
-      if (IE && doc.documentMode < 9 && !e.button) {
-        return stop();
-      }
-
       const t0 = 'touches' in e && e.touches[0];
       const pageX = t0 && t0.pageX || (e as MouseEvent).pageX;
       const pageY = t0 && t0.pageY || (e as MouseEvent).pageY;
