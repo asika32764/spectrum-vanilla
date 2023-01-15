@@ -42,8 +42,8 @@ exec(`yarn build:css`);
 console.log(`>>> yarn build:css:prod`);
 exec(`yarn build:css:prod`);
 
-console.log(`>>> npm version ${args.join(' ')} --git-tag-version false`);
-exec(`npm version ${args.join(' ')} --git-tag-version false`);
+console.log(`>>> npm version ${args.join(' ')}`);
+exec(`npm version ${args.join(' ')}`);
 
 console.log('>>> Git commit all');
 exec(`git add .`);
