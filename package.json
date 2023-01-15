@@ -1,7 +1,7 @@
 {
     "name": "spectrum-vanilla",
     "description": "The Spectrum Colorpicker with Vanilla JS",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "main": "dist/spectrum.js",
     "module": "dist/spectrum.es.js",
     "types": "dist/index.d.ts",
