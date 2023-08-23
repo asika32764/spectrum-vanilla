@@ -27,9 +27,6 @@ if (cliInput['help'] || cliInput['h']) {
   process.exit(0);
 }
 
-console.log(`>>> yarn build`);
-exec(`yarn build`);
-
 console.log(`>>> yarn build:prod`);
 exec(`yarn build:prod`);
 

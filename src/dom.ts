@@ -1,10 +1,3 @@
-/**
- * Part of spectrum-vanilla project.
- *
- * @copyright  Copyright (C) 2023 __ORGANIZATION__.
- * @license    __LICENSE__
- */
-
 export function insertAfter<T extends Element>(existingNode: T, newNode: Element): T {
   existingNode.parentNode?.insertBefore(newNode, existingNode.nextSibling);
   return existingNode;

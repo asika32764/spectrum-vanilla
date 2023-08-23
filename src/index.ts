@@ -1,3 +1,10 @@
+/**
+ * spectrum-vanilla.js
+ *
+ * @copyright  Copyright (C) 2023.
+ * @license    MIT
+ */
+
 import tinycolor, { ColorInput, Instance } from 'tinycolor2';
 import { insertAfter, outerWidthWithMargin, wrap } from './dom';
 import { SpectrumColorFormat, SpectrumOptions, SpectrumLang, SpectrumListener } from './types';
@@ -337,14 +344,17 @@ function spectrum(element: HTMLElement, options: Partial<SpectrumOptions>) {
     const inputStyle = window.getComputedStyle(boundElement);
 
     originalInputContainer = html('<span class="sp-original-input-container"></span>') as HTMLSpanElement;
-    ['margin'].forEach(function (cssProp: string) {
-      originalInputContainer.style[cssProp] = inputStyle[cssProp] || null;
+    ['margin'].forEach((cssProp: string)=> {
+      const st = originalInputContainer.style;
+      originalInputContainer.style.setProperty(cssProp, inputStyle.getPropertyValue(cssProp));
     });
     // inline-flex by default, switching to flex if needed
 
     if (inputStyle.display === 'block') {
       originalInputContainer.style.display = 'flex';
     }
+
+    boundElement.style.display = '';
 
     if (shouldReplace) {
       insertAfter(boundElement, replacer as Element);
@@ -1017,10 +1027,11 @@ function spectrum(element: HTMLElement, options: Partial<SpectrumOptions>) {
   }
 
   function destroy() {
-    delete boundElement.style.display;
+    boundElement.style.display = '';
     boundElement.classList.remove('spectrum', 'with-add-on', 'sp-colorize');
     offsetElement.removeEventListener('click', offsetElementStart);
     offsetElement.removeEventListener('touchstart', offsetElementStart);
+
     container.remove();
     replacer?.remove();
     if (colorizeElement) {
@@ -1035,7 +1046,10 @@ function spectrum(element: HTMLElement, options: Partial<SpectrumOptions>) {
     spectrums[spect.id] = null;
   }
 
-  function option(optionName: string | undefined = undefined, optionValue: any = undefined) {
+  function option<T extends keyof SpectrumOptions>(
+    optionName: T | undefined = undefined,
+    optionValue: SpectrumOptions[T] = undefined
+  ) {
     if (optionName === undefined) {
       return Object.assign({}, opts);
     }
@@ -1171,7 +1185,7 @@ function draggable(
   let maxWidth = 0;
   const hasTouch = ('ontouchstart' in window);
 
-  const duringDragEvents: { [P in keyof ElementEventMap]?: Function; } = {};
+  const duringDragEvents: { [P in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject; } = {};
   duringDragEvents['selectstart'] = prevent;
   duringDragEvents['dragstart'] = prevent;
   duringDragEvents['touchmove'] = move;
@@ -1218,7 +1232,7 @@ function draggable(
         offset = getElementOffset(element);
 
         for (const eventName in duringDragEvents) {
-          doc.addEventListener(eventName, duringDragEvents[eventName]);
+          doc.addEventListener(eventName, duringDragEvents[eventName as keyof typeof duringDragEvents]);
         }
 
         doc.body.classList.add('sp-dragging');
@@ -1233,7 +1247,7 @@ function draggable(
   function stop() {
     if (dragging) {
       for (const eventName in duringDragEvents) {
-        doc.removeEventListener(eventName, duringDragEvents[eventName]);
+        doc.removeEventListener(eventName, duringDragEvents[eventName as keyof typeof duringDragEvents]);
       }
       doc.body.classList.remove('sp-dragging');
 
@@ -1330,7 +1344,7 @@ export default class Spectrum {
     if (typeof selector === 'string') {
       return document.querySelector<HTMLElement>(selector);
     } else if ((selector as JQuery).jquery) {
-      return selector[0];
+      return (selector as JQuery)[0];
     } else {
       return selector as HTMLElement;
     }

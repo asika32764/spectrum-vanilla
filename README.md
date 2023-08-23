@@ -59,7 +59,6 @@ I'm just a maintainer, if you need some new features or found a bug, feel free t
 ```shell
 yarn build # build uncompressed JS
 yarn watch # build and watch
-yarn build:es # build ES version
 yarn build:css # build css files
 ```
 

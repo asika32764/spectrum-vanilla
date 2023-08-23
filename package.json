@@ -2,9 +2,10 @@
     "name": "spectrum-vanilla",
     "description": "The Spectrum Colorpicker with Vanilla JS",
     "version": "1.0.5",
-    "main": "dist/spectrum.js",
+    "main": "dist/spectrum.cjs",
+    "browser": "dist/spectrum.js",
     "module": "dist/spectrum.es.js",
-    "types": "dist/index.d.ts",
+    "typings": "dist/index.d.ts",
     "license": "MIT",
     "sideEffects": [
         "./src/spectrum.scss"
@@ -15,13 +16,12 @@
         "ui"
     ],
     "scripts": {
-        "build:prod": "cross-env NODE_ENV=production webpack && cross-env NODE_ENV=production LIB_TARGET=module webpack",
-        "build": "cross-env NODE_ENV=development webpack && cross-env NODE_ENV=development LIB_TARGET=module webpack",
-        "build:es": "cross-env NODE_ENV=development LIB_TARGET=module webpack",
+        "build:prod": "cross-env NODE_ENV=production rollup -c",
+        "build": "cross-env NODE_ENV=development rollup -c",
         "build:i18n": "cp -r src/i18n dist && cp -r src/i18n-es dist",
-        "build:css:prod": "node-sass --output-style compressed src/spectrum.scss dist/spectrum.min.css && node-sass --output-style compressed src/spectrum-dark.scss dist/spectrum-dark.min.css",
-        "build:css": "node-sass --source-map true src/spectrum.scss dist/spectrum.css && node-sass --source-map true src/spectrum-dark.scss dist/spectrum-dark.css",
-        "watch": "cross-env NODE_ENV=development webpack --watch"
+        "build:css:prod": "sass --style compressed src/spectrum.scss dist/spectrum.min.css && sass --style compressed src/spectrum-dark.scss dist/spectrum-dark.min.css",
+        "build:css": "sass --source-map src/spectrum.scss dist/spectrum.css && sass --source-map src/spectrum-dark.scss dist/spectrum-dark.css",
+        "watch": "cross-env NODE_ENV=development rollup -cw"
     },
     "homepage": "https://github.com/asika32764/spectrum-vanilla",
     "repository": {
@@ -38,22 +38,23 @@
         "@babel/plugin-proposal-optional-chaining": "^7.14.5",
         "@babel/preset-env": "^7.14.5",
         "@babel/preset-typescript": "^7.18.6",
+        "@rollup/plugin-babel": "^6.0.3",
+        "@rollup/plugin-node-resolve": "^15.2.1",
+        "@rollup/plugin-typescript": "^11.1.2",
         "@types/jquery": "^3.5.16",
         "@types/tinycolor2": "^1.4.3",
-        "babel-loader": "^9.1.2",
         "cross-env": "^7.0.3",
-        "css-loader": "^6.7.3",
-        "extract-text-webpack-plugin": "^3.0.2",
+        "esbuild": "^0.19.2",
         "jquery": "^3.6.3",
-        "mini-css-extract-plugin": "^2.7.2",
         "minimist": "^1.2.7",
-        "node-sass": "^8.0.0",
-        "sass-loader": "^13.2.0",
-        "style-loader": "^3.3.1",
+        "rollup": "^3.28.1",
+        "rollup-plugin-cleanup": "^3.2.1",
+        "rollup-plugin-dts": "^5.0",
+        "rollup-plugin-esbuild": "^5.0.0",
+        "sass": "^1.66.1",
+        "terser": "^5.19.2",
         "tinycolor2": "^1.5.2",
-        "ts-loader": "^9.4.2",
-        "typescript": "^4.9.4",
-        "webpack": "^5.75.0",
-        "webpack-cli": "^5.0.1"
+        "tslib": "^2.6.2",
+        "typescript": "^5.1.6"
     }
 }

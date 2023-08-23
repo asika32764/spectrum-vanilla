@@ -1,10 +1,3 @@
-/**
- * Part of spectrum-vanilla project.
- *
- * @copyright  Copyright (C) 2023 __ORGANIZATION__.
- * @license    __LICENSE__
- */
-
 export function html(html: string, doc = document) {
   const div = doc.createElement('div');
   div.innerHTML = html;
@@ -149,7 +142,7 @@ export function setElementOffset(
     options.using.call(elem, props);
   } else {
     for (const k in props) {
-      curElem.style[k] = props[k] + 'px';
+      curElem.style.setProperty(k, props[k as keyof typeof props] + 'px');
     }
   }
 }
