@@ -250,9 +250,10 @@ function spectrum(element: HTMLElement, options: Partial<SpectrumOptions>) {
     shouldReplace = isInput && (type === 'color' || isInputTypeColor),
     replacer = (shouldReplace)
       ? (() => {
-        addClass(replaceInput, theme);
-        addClass(replaceInput, opts.replacerClassName);
-        return replaceInput;
+        const el = replaceInput.cloneNode(true) as HTMLElement;
+        addClass(el, theme);
+        addClass(el, opts.replacerClassName);
+        return el;
       })()
       : null,
     offsetElement = (shouldReplace) ? replacer : boundElement,
