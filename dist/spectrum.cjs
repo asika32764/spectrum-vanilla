@@ -1586,9 +1586,10 @@ function spectrum(element, options) {
     doc.body.appendChild(container);
     doc.body; let boundElement = element, disabled = false, pickerContainer = container.querySelector('.sp-picker-container'), dragger = container.querySelector('.sp-color'), dragHelper = container.querySelector('.sp-dragger'), slider = container.querySelector('.sp-hue'), slideHelper = container.querySelector('.sp-slider'), alphaSliderInner = container.querySelector('.sp-alpha-inner'), alphaSlider = container.querySelector('.sp-alpha'), alphaSlideHelper = container.querySelector('.sp-alpha-handle'), textInput = container.querySelector('.sp-input'), paletteContainer = container.querySelector('.sp-palette'), initialColorContainer = container.querySelector('.sp-initial'), cancelButton = container.querySelector('.sp-cancel'), clearButton = container.querySelector('.sp-clear'), chooseButton = container.querySelector('.sp-choose'), toggleButton = container.querySelector('.sp-palette-toggle'), isInput = boundElement.nodeName === 'INPUT', isInputTypeColor = isInput && boundElement.getAttribute('type') === 'color', shouldReplace = isInput && (type === 'color' || isInputTypeColor), replacer = (shouldReplace)
         ? (() => {
-            addClass(replaceInput, theme);
-            addClass(replaceInput, opts.replacerClassName);
-            return replaceInput;
+            const el = replaceInput.cloneNode(true);
+            addClass(el, theme);
+            addClass(el, opts.replacerClassName);
+            return el;
         })()
         : null, offsetElement = (shouldReplace) ? replacer : boundElement, previewElement = replacer === null || replacer === void 0 ? void 0 : replacer.querySelector('.sp-preview-inner'), initialColor = opts.color || (isInput && boundElement.value), colorOnShow = '', currentPreferredFormat = opts.preferredFormat, clickoutFiresChange = !opts.showButtons || opts.clickoutFiresChange, isEmpty = !initialColor, allowEmpty = opts.allowEmpty;
     // Element to be updated with the input color. Populated in initialize method

@@ -8,13 +8,35 @@
   <link rel="stylesheet" href="../dist/spectrum.css" />
 </head>
 <body>
-<input type="color" name="" id="picker" data-locale="zh-tw" />
+<div>
+    <input  id="first" name="first"  value="#ffffff">
+</div>
 
+<div>
+    <input  id="second" name="second"  value="#ffffff">
+</div>
 <script>
-  const options = { replacerClassName: 'hello' };
-  const sp = Spectrum.create('#picker', options);
 
-  const r = sp.option('allowEmpty', true)
+Spectrum.getInstance('#first', {
+  type: "color",
+  showButtons: false,
+  allowEmpty: false
+});
+
+
+Spectrum.getInstance('#second', {
+  type: "color",
+  showButtons: false,
+  allowEmpty: false
+});
+
 </script>
+
+<!--<script>-->
+<!--  const options = { replacerClassName: 'hello' };-->
+<!--  const sp = Spectrum.create('#picker', options);-->
+
+<!--  const r = sp.option('allowEmpty', true)-->
+<!--</script>-->
 </body>
 </html>

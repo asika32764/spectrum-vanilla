@@ -32,7 +32,7 @@ export default [
       ? [
       {
           file: addMinToFilename(pkg.browser),
-          format: 'esm',
+          format: 'umd',
           sourcemap: true,
           name: 'Spectrum',
           plugins: [
