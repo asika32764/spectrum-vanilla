@@ -271,7 +271,7 @@ input.spectrum.with-add-on {
 }
 
 .sp-cf {
-  *zoom: 1;
+  zoom: 1;
 }
 .sp-cf:before {
   content: "";
